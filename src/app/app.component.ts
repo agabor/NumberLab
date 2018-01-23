@@ -10,9 +10,10 @@ export class AppComponent {
   loaded = false;
   private _spreadsheetId = null;
   gapi: any = null;
+  loader: SheetLoader = new SheetLoader;
   section: Section = new Section('Alapok', 'Most megtanuljuk az alapokat', [
-    new Task('Írj egy 1-est az A1 cellába, és egy 2-est a B1 cellába!', [new Field(0, 0, '1', '1'), new Field(1, 0, '2', '2')]),
-    new Task('Számítsd ki az A1 és a B1 cella értékét a C1-es cellába!', [new Field(2, 0, '3', '=A1+B1')])
+    new Task('Írj egy 1-est az A1 cellába, és egy 2-est a B1 cellába!', [new Field(0, 0, '1', ['1']), new Field(1, 0, '2', ['2'])]),
+    new Task('Számítsd ki az A1 és a B1 cella értékét a C1-es cellába!', [new Field(2, 0, '3', ['=A1+B1', '=B1+A1'])])
   ]);
   activeTask: Task = null;
   finishedTasks: Task[] = [];
@@ -25,6 +26,7 @@ export class AppComponent {
   sheetsAPILoaded(event) {
    console.log('loaded');
     this.gapi = window['gapi'];
+    this.loader.gapi = this.gapi;
     // Listen for sign-in state changes.
     this.gapi.auth2.getAuthInstance().isSignedIn.listen(this.updateSigninStatus);
 
@@ -58,47 +60,27 @@ export class AppComponent {
   }
 
   checkTask() {
-    console.log('checking');
-    const self = this;
-    let values: string[][] = null;
-    let formulas: string[][] = null;
-    this.gapi.client.sheets.spreadsheets.values.get({
-      spreadsheetId: this._spreadsheetId,
-      range: 'Sheet1!A1:E10'
-    }).then(function (response) {
-      console.log('got values');
-      values = response.result.values;
-      if (formulas) {
-        self.checkTasks(values, formulas);
-      }
-    }, function (response) {
-      console.log(response.result.error.message);
-    });
-    this.gapi.client.sheets.spreadsheets.values.get({
-      spreadsheetId: this._spreadsheetId,
-      range: 'Sheet1!A1:E10',
-      valueRenderOption: 'FORMULA'
-    }).then(function (response) {
-      console.log('got formulas');
-      formulas = response.result.values;
-      if (values) {
-        self.checkTasks(values, formulas);
-      }
-    }, function (response) {
-      console.log(response.result.error.message);
-    });
+    this.loader.onLoaded = (sheets) => this.checkTasks(sheets);
+    this.loader.load(this._spreadsheetId);
   }
 
-  checkTasks(values: string[][], formulas: string[][]) {
+  checkTasks(sheet: Sheet) {
+    console.log('checkTasks');
     this.finishedTasks = [];
+    this.activeTask = null;
     for (const t of this.section.tasks) {
-      if (!t.check(values, formulas)) {
+      console.log('checking');
+      console.log(t);
+      if (!t.check(sheet)) {
+        console.log('found');
         this.activeTask = t;
-        return;
+        break;
       } else {
+        console.log('ok');
         this.finishedTasks.unshift(t);
       }
     }
+    this.cdr.detectChanges();
   }
 
 
@@ -132,15 +114,16 @@ class Task {
   constructor(public description: string, public fields: Field[]) {
   }
 
-  check(values: string[][], formulas: string[][]): boolean {
-    this.valueOk = this.checkValues(values);
-    this.formulaOk = this.checkFormulas(formulas);
+  check(sheet: Sheet): boolean {
+    console.log('checking task');
+    this.valueOk = this.checkValues(sheet);
+    this.formulaOk = this.checkFormulas(sheet);
     return this.valueOk && this.formulaOk;
   }
 
-  checkValues(values: string[][]): boolean {
+  checkValues(sheet: Sheet): boolean {
       for (const field of this.fields) {
-        const value = String(values[field.row][field.column]);
+        const value = String(sheet.getValue(field.column, field.row));
         if (value !== field.value) {
           this.errorMessage = 'Hiba!';
           return false;
@@ -149,10 +132,10 @@ class Task {
       return true;
   }
 
-  checkFormulas(values: string[][]): boolean {
+  checkFormulas(sheet: Sheet): boolean {
     for (const field of this.fields) {
-      const formula = String(values[field.row][field.column]);
-      if (formula.replace(/ /g, '') !== field.formula) {
+      const formula = String(sheet.getFormula(field.column, field.row));
+      if (!field.checkFormula(formula)) {
         if (formula === field.value) {
           this.errorMessage = 'Próbáld meg képlettel megoldani!';
         } else {
@@ -166,6 +149,70 @@ class Task {
 }
 
 class Field {
-  constructor(public column: number, public row: number, public value: string, public formula: string) {
+  constructor(public column: number, public row: number, public value: string, public formulas: string[]) {
+  }
+
+  public checkFormula(formula: string) {
+    formula = formula.replace(/ /g, '');
+    for (const f of this.formulas) {
+      if (f === formula) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+class Sheet {
+  values: string[][];
+  formulas: string[][];
+  getValue(column: number, row: number): string {
+    if (this.values) {
+      return this.values[row][column];
+    }
+  }
+  getFormula(column: number, row: number): string {
+    if (this.values) {
+      return this.formulas[row][column];
+    }
+  }
+}
+
+class SheetLoader {
+  gapi: any = null;
+  onLoaded: (sheet: Sheet) => void;
+
+  load(spreadsheetId: string) {
+    const sheet = new Sheet();
+    const self = this;
+
+    let valuesLoaded = false;
+    let fromulasLoaded = false;
+
+    this.gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: spreadsheetId,
+      range: 'Sheet1!A1:E10'
+    }).then(function (response) {
+      sheet.values = response.result.values;
+      valuesLoaded = true;
+      if (fromulasLoaded) {
+        self.onLoaded(sheet);
+      }
+    }, function (response) {
+      console.log(response.result.error.message);
+    });
+    this.gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: spreadsheetId,
+      range: 'Sheet1!A1:E10',
+      valueRenderOption: 'FORMULA'
+    }).then(function (response) {
+      sheet.formulas = response.result.values;
+      fromulasLoaded = true;
+      if (valuesLoaded) {
+        self.onLoaded(sheet);
+      }
+    }, function (response) {
+      console.log(response.result.error.message);
+    });
   }
 }

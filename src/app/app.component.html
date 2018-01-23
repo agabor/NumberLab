@@ -9,9 +9,12 @@
   <div class="alert {{activeTask.errorMessage ? 'alert-danger' : 'alert-info'}} active-task" role="alert" *ngIf="activeTask != null">
     <span *ngIf="activeTask.errorMessage" class="glyphicon glyphicon-remove"></span>
     <span *ngIf="!activeTask.errorMessage" class="glyphicon glyphicon-pencil"></span>
-    {{activeTask.description}}
-    <button class="btn-primary" (click)="checkTask()" style="display: block" >Check</button>
+    <strong>{{activeTask.description}}</strong>
+    <button class="btn-primary" (click)="checkTask()" style="display: block; float: right;" >Check</button>
     <div *ngIf="activeTask.errorMessage != null">{{activeTask.errorMessage}}</div>
+  </div>
+  <div class="alert alert-success active-task" role="alert" *ngIf="activeTask == null">
+    <strong>Gratulálunk!</strong>
   </div>
   <div class="alert alert-success" role="alert" *ngFor="let t of finishedTasks"> <span class="glyphicon glyphicon-ok"></span> {{t.description}}</div>
 </div>
