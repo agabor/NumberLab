@@ -28,7 +28,7 @@ export class AppComponent {
     this.gapi = window['gapi'];
     this.loader.gapi = this.gapi;
     // Listen for sign-in state changes.
-    this.gapi.auth2.getAuthInstance().isSignedIn.listen(this.updateSigninStatus);
+    this.gapi.auth2.getAuthInstance().isSignedIn.listen(status => this.updateSigninStatus(status));
 
     // Handle the initial sign-in state.
     this.updateSigninStatus(this.gapi.auth2.getAuthInstance().isSignedIn.get());
@@ -48,7 +48,7 @@ export class AppComponent {
           console.log(response);
           self._spreadsheetId = response.result.spreadsheetId;
           localStorage.setItem('spreadsheetId', self._spreadsheetId);
-          this.checkTask();
+          self.checkTask();
           self.cdr.detectChanges();
         });
       } else {
@@ -96,7 +96,7 @@ export class AppComponent {
 
   sheetURL() {
     return this.sanitizer.bypassSecurityTrustResourceUrl('https://docs.google.com/spreadsheets/d/' +
-      this._spreadsheetId + '/edit?rm=minimal#gid=0');
+      this._spreadsheetId + '/edit?rm=embedded#gid=0');
   }
 }
 
@@ -123,9 +123,9 @@ class Task {
 
   checkValues(sheet: Sheet): boolean {
       for (const field of this.fields) {
-        const value = String(sheet.getValue(field.column, field.row));
+        const value = sheet.getValue(field);
         if (value !== field.value) {
-          this.errorMessage = 'Hiba!';
+          this.errorMessage = '(' + field.column + ', ' + field.row + ') expected value: ' + field.value + ' actual: ' + value;
           return false;
         }
       }
@@ -134,12 +134,12 @@ class Task {
 
   checkFormulas(sheet: Sheet): boolean {
     for (const field of this.fields) {
-      const formula = String(sheet.getFormula(field.column, field.row));
+      const formula = sheet.getFormula(field);
       if (!field.checkFormula(formula)) {
         if (formula === field.value) {
           this.errorMessage = 'Próbáld meg képlettel megoldani!';
         } else {
-          this.errorMessage = 'Hiba!';
+          this.errorMessage = '(' + field.column + ', ' + field.row + ') expected formula: ' + field.formulas + ' actual: ' + formula;
         }
         return false;
       }
@@ -164,16 +164,16 @@ class Field {
 }
 
 class Sheet {
-  values: string[][];
-  formulas: string[][];
-  getValue(column: number, row: number): string {
+  values: string[][] = [];
+  formulas: string[][] = [];
+  getValue(field: Field): string {
     if (this.values) {
-      return this.values[row][column];
+      return this.values[field.row][field.column];
     }
   }
-  getFormula(column: number, row: number): string {
+  getFormula(field: Field): string {
     if (this.values) {
-      return this.formulas[row][column];
+      return this.formulas[field.row][field.column];
     }
   }
 }
@@ -186,31 +186,34 @@ class SheetLoader {
     const sheet = new Sheet();
     const self = this;
 
-    let valuesLoaded = false;
-    let fromulasLoaded = false;
-
-    this.gapi.client.sheets.spreadsheets.values.get({
+    this.gapi.client.sheets.spreadsheets.get({
       spreadsheetId: spreadsheetId,
-      range: 'Sheet1!A1:E10'
+      ranges: ['Sheet1!A1:E10'],
+      includeGridData: true
     }).then(function (response) {
-      sheet.values = response.result.values;
-      valuesLoaded = true;
-      if (fromulasLoaded) {
-        self.onLoaded(sheet);
+      console.log(response.result.sheets[0].data[0].rowData);
+      for (const data of response.result.sheets[0].data[0].rowData) {
+        const values: string[] = [];
+        const formulas: string[] = [];
+        if (data.values) {
+          for (const cell of data.values) {
+            values.push(cell.formattedValue || '');
+            const userEnteredValue = cell.userEnteredValue;
+            if (userEnteredValue) {
+              formulas.push(userEnteredValue.stringValue
+                || cell.userEnteredValue.formulaValue
+                || String(userEnteredValue.numberValue)
+                || '');
+            } else {
+              formulas.push('');
+            }
+          }
+        }
+        sheet.values.push(values);
+        sheet.formulas.push(formulas);
       }
-    }, function (response) {
-      console.log(response.result.error.message);
-    });
-    this.gapi.client.sheets.spreadsheets.values.get({
-      spreadsheetId: spreadsheetId,
-      range: 'Sheet1!A1:E10',
-      valueRenderOption: 'FORMULA'
-    }).then(function (response) {
-      sheet.formulas = response.result.values;
-      fromulasLoaded = true;
-      if (valuesLoaded) {
-        self.onLoaded(sheet);
-      }
+      console.log(sheet);
+      self.onLoaded(sheet);
     }, function (response) {
       console.log(response.result.error.message);
     });
