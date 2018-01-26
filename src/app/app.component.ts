@@ -12,8 +12,8 @@ export class AppComponent {
   gapi: any = null;
   loader: SheetLoader = new SheetLoader;
   section: Section = new Section('Alapok', 'Most megtanuljuk az alapokat', [
-    new Task('Írj egy 1-est az A1 cellába, és egy 2-est a B1 cellába!', [new Field(0, 0, '1', ['1']), new Field(1, 0, '2', ['2'])]),
-    new Task('Számítsd ki az A1 és a B1 cella értékét a C1-es cellába!', [new Field(2, 0, '3', ['=A1+B1', '=B1+A1'])])
+    new Task('Írj egy 1-est az A1 cellába, és egy 2-est a B1 cellába!', [new ValueTaskField(0, 0, '1'), new ValueTaskField(1, 0, '2')]),
+    new Task('Számítsd ki az A1 és a B1 cella értékét a C1-es cellába!', [new FormulaTaskField(2, 0, ['=A1+B1', '=B1+A1'])])
   ]);
   activeTask: Task = null;
   finishedTasks: Task[] = [];
@@ -109,38 +109,25 @@ class Section {
 class Task {
   valueOk = false;
   formulaOk = false;
-  errorMessage: string = null;
+  get errorMessage(): string {
+    let result = '';
+    for (const field of this.fields) {
+      if (field.errorMessage) {
+        if (result.length > 0) {
+          result += '\n';
+        }
+        result += field.errorMessage;
+      }
+    }
+    return result;
+  }
 
-  constructor(public description: string, public fields: Field[]) {
+  constructor(public description: string, public fields: TaskField[]) {
   }
 
   check(sheet: Sheet): boolean {
-    console.log('checking task');
-    this.valueOk = this.checkValues(sheet);
-    this.formulaOk = this.checkFormulas(sheet);
-    return this.valueOk && this.formulaOk;
-  }
-
-  checkValues(sheet: Sheet): boolean {
-      for (const field of this.fields) {
-        const value = sheet.getValue(field);
-        if (value !== field.value) {
-          this.errorMessage = '(' + field.column + ', ' + field.row + ') expected value: ' + field.value + ' actual: ' + value;
-          return false;
-        }
-      }
-      return true;
-  }
-
-  checkFormulas(sheet: Sheet): boolean {
     for (const field of this.fields) {
-      const formula = sheet.getFormula(field);
-      if (!field.checkFormula(formula)) {
-        if (formula === field.value) {
-          this.errorMessage = 'Próbáld meg képlettel megoldani!';
-        } else {
-          this.errorMessage = '(' + field.column + ', ' + field.row + ') expected formula: ' + field.formulas + ' actual: ' + formula;
-        }
+      if (!field.check(sheet.getField(field))) {
         return false;
       }
     }
@@ -148,34 +135,81 @@ class Task {
   }
 }
 
-class Field {
-  constructor(public column: number, public row: number, public value: string, public formulas: string[]) {
+abstract class TaskField {
+  errorMessage: string = null;
+
+  constructor(public column: number, public row: number) {
   }
 
-  public checkFormula(formula: string) {
+  abstract check(field: Field): boolean;
+}
+
+class ValueTaskField extends TaskField {
+
+  constructor(public column: number, public row: number, public value: string) {
+    super(column, row);
+  }
+
+
+  check(field: Field): boolean {
+    if (this.value !== field.value) {
+      this.errorMessage = '(' + this.column + ', ' + this.row + ') expected value: ' + this.value + ' actual: ' + field.value;
+      return false;
+    }
+    return true;
+  }
+
+}
+
+class FormulaTaskField extends TaskField {
+
+  constructor(public column: number, public row: number, public formulas: string[]) {
+    super(column, row);
+  }
+
+
+  check(field: Field): boolean {
+    let formula = field.formula;
     formula = formula.replace(/ /g, '');
     for (const f of this.formulas) {
       if (f === formula) {
         return true;
       }
     }
+    this.errorMessage = '(' + this.column + ', ' + this.row + ') expected formula: ' + this.formulas + ' actual: ' + field.formula;
     return false;
+  }
+
+}
+
+class Color {
+  constructor(red: number, green: number, blue: number) {
+
   }
 }
 
+class Field {
+  value: string;
+  formula: string;
+  backgroundColor: Color;
+  foregroundColor: Color;
+  bold: boolean;
+  italic: boolean;
+}
+
 class Sheet {
-  values: string[][] = [];
-  formulas: string[][] = [];
-  getValue(field: Field): string {
-    if (this.values) {
-      return this.values[field.row][field.column];
+  fields: Field[][] = [];
+
+
+  getField(field: TaskField): Field {
+    if (this.fields) {
+      const row = this.fields[field.row];
+      if (row) {
+        return row[field.column];
+      }
     }
   }
-  getFormula(field: Field): string {
-    if (this.values) {
-      return this.formulas[field.row][field.column];
-    }
-  }
+
 }
 
 class SheetLoader {
@@ -193,24 +227,24 @@ class SheetLoader {
     }).then(function (response) {
       console.log(response.result.sheets[0].data[0].rowData);
       for (const data of response.result.sheets[0].data[0].rowData) {
-        const values: string[] = [];
-        const formulas: string[] = [];
+        const row: Field[] = [];
         if (data.values) {
           for (const cell of data.values) {
-            values.push(cell.formattedValue || '');
+            const field = new Field();
+            field.value = cell.formattedValue || '';
             const userEnteredValue = cell.userEnteredValue;
             if (userEnteredValue) {
-              formulas.push(userEnteredValue.stringValue
+              field.formula = userEnteredValue.stringValue
                 || cell.userEnteredValue.formulaValue
                 || String(userEnteredValue.numberValue)
-                || '');
+                || '';
             } else {
-              formulas.push('');
+              field.formula = '';
             }
+            row.push(field);
           }
         }
-        sheet.values.push(values);
-        sheet.formulas.push(formulas);
+        sheet.fields.push(row);
       }
       console.log(sheet);
       self.onLoaded(sheet);
