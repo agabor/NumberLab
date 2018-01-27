@@ -12,8 +12,12 @@ export class AppComponent {
   gapi: any = null;
   loader: SheetLoader = new SheetLoader;
   section: Section = new Section('Alapok', 'Most megtanuljuk az alapokat', [
-    new Task('Írj egy 1-est az A1 cellába, és egy 2-est a B1 cellába!', [new ValueTaskField(0, 0, '1'), new ValueTaskField(1, 0, '2')]),
-    new Task('Számítsd ki az A1 és a B1 cella értékét a C1-es cellába!', [new FormulaTaskField(2, 0, ['=A1+B1', '=B1+A1'])])
+    new Task('Írd az A1-es cellába hogy "oszlop1" és a B1-es cellába hogy "oszlop2"',
+      [new ValueTaskField(0, 0, 'oszlop1'), new ValueTaskField(1, 0, 'oszlop2')]),
+    new Task('Színezd mindkét cella hátterét zöldre!',
+      [new FormatTaskField(0, 0, {backgroundColor: new Color(0, 1, 0)}), new FormatTaskField(1, 0, {backgroundColor: new Color(0, 1, 0)})]),
+    new Task('Írj egy 1-est az A2 cellába, és egy 2-est a B2 cellába!', [new ValueTaskField(0, 1, '1'), new ValueTaskField(1, 1, '2')]),
+    new Task('Számítsd ki az A1 és a B1 cella értékét a C2-es cellába!', [new FormulaTaskField(2, 1, ['=A1+B1', '=B1+A1'])])
   ]);
   activeTask: Task = null;
   finishedTasks: Task[] = [];
@@ -60,6 +64,9 @@ export class AppComponent {
   }
 
   checkTask() {
+    if (this.activeTask) {
+      this.activeTask.attempted = true;
+    }
     this.loader.onLoaded = (sheets) => this.checkTasks(sheets);
     this.loader.load(this._spreadsheetId);
   }
@@ -107,16 +114,15 @@ class Section {
 }
 
 class Task {
-  valueOk = false;
-  formulaOk = false;
+  attempted = false;
   get errorMessage(): string {
     let result = '';
     for (const field of this.fields) {
-      if (field.errorMessage) {
+      for (const hint of field.hints) {
         if (result.length > 0) {
           result += '\n';
         }
-        result += field.errorMessage;
+        result += hint;
       }
     }
     return result;
@@ -135,13 +141,32 @@ class Task {
   }
 }
 
+class Hint {
+  constructor(public field: TaskField, public expected: any, public actual: any, public type: string) {
+
+  }
+
+  public toString(): string {
+    let result = `Az ${this.field} cellába a következő ${this.type} kell megadni: ${this.expected}.`;
+    if (this.actual) {
+      result += `Most ez van benne: ${this.actual}`;
+    }
+    return result;
+  }
+}
+
 abstract class TaskField {
-  errorMessage: string = null;
+  hints: Hint[] = [];
 
   constructor(public column: number, public row: number) {
   }
 
   abstract check(field: Field): boolean;
+
+
+  public toString() {
+    return String.fromCharCode('A'.charCodeAt(0) + this.column) + this.row;
+  }
 }
 
 class ValueTaskField extends TaskField {
@@ -152,8 +177,9 @@ class ValueTaskField extends TaskField {
 
 
   check(field: Field): boolean {
-    if (this.value !== field.value) {
-      this.errorMessage = '(' + this.column + ', ' + this.row + ') expected value: ' + this.value + ' actual: ' + field.value;
+    this.hints = [];
+    if (!field || this.value !== field.value) {
+      this.hints.push(new Hint(this, this.value, field.value, 'értéket'));
       return false;
     }
     return true;
@@ -169,32 +195,81 @@ class FormulaTaskField extends TaskField {
 
 
   check(field: Field): boolean {
-    let formula = field.formula;
-    formula = formula.replace(/ /g, '');
-    for (const f of this.formulas) {
-      if (f === formula) {
-        return true;
+    this.hints = [];
+    if (field) {
+      let formula = field.formula;
+      formula = formula.replace(/ /g, '');
+      for (const f of this.formulas) {
+        if (f === formula) {
+          return true;
+        }
       }
+      this.hints.push(new Hint(this, this.formulas, field.formula, 'formulák egyikét'));
     }
-    this.errorMessage = '(' + this.column + ', ' + this.row + ') expected formula: ' + this.formulas + ' actual: ' + field.formula;
+    this.hints.push(new Hint(this, this.formulas, null, 'formulák egyikét'));
     return false;
   }
 
 }
 
+
+class FormatTaskField extends TaskField {
+
+  constructor(public column: number, public row: number, public format: Format) {
+    super(column, row);
+  }
+
+  private static colorDistance(color1: Color, color2: Color) {
+    function sqr(x: number) { return x * x; }
+    return Math.sqrt(sqr(color1.red - color2.red)
+      + sqr(color1.green - color2.green)
+      + sqr(color1.blue - color2.blue));
+  }
+
+  check(field: Field): boolean {
+    this.hints = [];
+    if (field) {
+      const actualBG = field.format.backgroundColor;
+      const expectedBG = this.format.backgroundColor;
+      if (expectedBG && FormatTaskField.colorDistance(actualBG, expectedBG) > 0.5) {
+        this.hints.push(new Hint(this, expectedBG, actualBG, 'háttérszínt'));
+        return false;
+      }
+      const actualFG = field.format.backgroundColor;
+      const expectedFG = this.format.backgroundColor;
+      if (expectedFG && FormatTaskField.colorDistance(actualFG, expectedFG) > 0.5) {
+        this.hints.push(new Hint(this, expectedFG, actualFG, 'szövegszínt'));
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+}
+
 class Color {
-  constructor(red: number, green: number, blue: number) {
+  constructor(public red: number, public green: number, public blue: number) {
 
   }
+
+  public toString = (): string => {
+    return `(r: ${this.red}, g: ${this.green}, b: ${this.blue})`;
+  }
+}
+
+class Format {
+  backgroundColor?: Color = null;
+  foregroundColor?: Color = null;
+  bold?: boolean = null;
+  italic?: boolean = null;
+  underline?: boolean = null;
+  strikethrough?: boolean = null;
 }
 
 class Field {
   value: string;
   formula: string;
-  backgroundColor: Color;
-  foregroundColor: Color;
-  bold: boolean;
-  italic: boolean;
+  format: Format;
 }
 
 class Sheet {
@@ -216,6 +291,32 @@ class SheetLoader {
   gapi: any = null;
   onLoaded: (sheet: Sheet) => void;
 
+  private static parseFormula(cell): string {
+    const userEnteredValue = cell.userEnteredValue;
+    if (userEnteredValue) {
+      return userEnteredValue.stringValue
+        || cell.userEnteredValue.formulaValue
+        || String(userEnteredValue.numberValue)
+        || '';
+    }
+    return '';
+  }
+
+
+  private static parseFormat(effectiveFormat: any) {
+    const format = new Format;
+    if (effectiveFormat) {
+      const bgcolor = effectiveFormat.backgroundColor;
+      format.backgroundColor = new Color(bgcolor.red || 0, bgcolor.green || 0, bgcolor.blue || 0);
+      const fgcolor = effectiveFormat.textFormat.foregroundColor;
+      format.foregroundColor = new Color(fgcolor.red || 0, fgcolor.green || 0, fgcolor.blue || 0);
+      format.bold = effectiveFormat.textFormat.bold;
+      format.italic = effectiveFormat.textFormat.italic;
+      format.underline = effectiveFormat.textFormat.underline;
+      format.strikethrough = effectiveFormat.textFormat.strikethrough;
+    }
+    return format;
+  }
   load(spreadsheetId: string) {
     const sheet = new Sheet();
     const self = this;
@@ -232,15 +333,8 @@ class SheetLoader {
           for (const cell of data.values) {
             const field = new Field();
             field.value = cell.formattedValue || '';
-            const userEnteredValue = cell.userEnteredValue;
-            if (userEnteredValue) {
-              field.formula = userEnteredValue.stringValue
-                || cell.userEnteredValue.formulaValue
-                || String(userEnteredValue.numberValue)
-                || '';
-            } else {
-              field.formula = '';
-            }
+            field.formula = SheetLoader.parseFormula(cell);
+            field.format = SheetLoader.parseFormat(cell.effectiveFormat);
             row.push(field);
           }
         }
@@ -252,4 +346,5 @@ class SheetLoader {
       console.log(response.result.error.message);
     });
   }
+
 }
