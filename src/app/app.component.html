@@ -7,11 +7,13 @@
     <div class="loader" [hidden]="loaded"></div>
   </div>
   <div class="alert {{activeTask.attempted ? 'alert-danger' : 'alert-info'}} active-task" role="alert" *ngIf="activeTask != null">
-    <span *ngIf="activeTask.errorMessage" class="glyphicon glyphicon-remove"></span>
-    <span *ngIf="!activeTask.errorMessage" class="glyphicon glyphicon-pencil"></span>
-    <strong>{{activeTask.description}}</strong>
+    <span *ngIf="activeTask.attempted" class="glyphicon glyphicon-remove"></span>
+    <span *ngIf="!activeTask.attempted" class="glyphicon glyphicon-pencil"></span>
+    <div [innerHTML]="activeTask.description"></div>
+    <div *ngIf="activeTask.style" [ngStyle]="activeTask.style">hello</div>
     <button class="btn-primary" (click)="checkTask()" style="display: block; float: right;" >Check</button>
-    <div *ngIf="activeTask.attempted">{{activeTask.errorMessage}}</div>
+    <button class="btn-primary" (click)="showHints()" [hidden]="!activeTask.attempted || hintsShown">Show Hint</button>
+    <div *ngIf="activeTask.attempted" [hidden]="!hintsShown">{{activeTask.errorMessage}}</div>
   </div>
   <div class="alert alert-success active-task" role="alert" *ngIf="activeTask == null">
     <strong>Gratulálunk!</strong>
