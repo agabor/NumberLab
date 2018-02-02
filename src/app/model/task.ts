@@ -1,7 +1,8 @@
 
 import {Sheet} from './sheet';
-import {FormatTaskField, TaskField} from './taskfield';
+import {TaskField} from './taskfield';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
+import {FormatTaskField} from './formattaskfield';
 
 export class Task {
   attempted = false;
@@ -9,11 +10,11 @@ export class Task {
   get errorMessage(): SafeHtml {
     let result = '';
     for (const field of this.fields) {
-      for (const hint of field.hints) {
+      if (field.hint) {
         if (result.length > 0) {
-          result += '\n';
+          result += '<br>';
         }
-        result += hint;
+        result += field.hint;
       }
     }
     return this.sanitizer.bypassSecurityTrustHtml(result);

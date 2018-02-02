@@ -4,8 +4,10 @@ import {Sheet} from './model/sheet';
 import {Section} from './model/section';
 import {Task} from './model/task';
 import {SheetLoader} from './loader';
-import {FormatTaskField, ValueTaskField, FormulaTaskField} from './model/taskfield';
 import {Color} from './model/color';
+import {ValueTaskField} from './model/valuetaskfield';
+import {FormatTaskField} from './model/formattaskfield';
+import {FormulaTaskField} from './model/formulataskfield';
 
 @Component({
   selector: 'app-root',
