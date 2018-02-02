@@ -10,13 +10,13 @@
     <span *ngIf="activeTask.attempted" class="glyphicon glyphicon-remove"></span>
     <span *ngIf="!activeTask.attempted" class="glyphicon glyphicon-pencil"></span>
     <div [innerHTML]="activeTask.description"></div>
-    <div *ngIf="activeTask.style" [ngStyle]="activeTask.style">hello</div>
+    <div *ngIf="activeTask.style" style="{{activeTask.style}}">hello</div>
     <button class="btn-primary" (click)="checkTask()" style="display: block; float: right;" >Check</button>
     <button class="btn-primary" (click)="showHints()" [hidden]="!activeTask.attempted || hintsShown">Show Hint</button>
-    <div *ngIf="activeTask.attempted" [hidden]="!hintsShown">{{activeTask.errorMessage}}</div>
+    <div *ngIf="activeTask.attempted" [hidden]="!hintsShown" [innerHTML]="activeTask.errorMessage"></div>
   </div>
   <div class="alert alert-success active-task" role="alert" *ngIf="activeTask == null">
     <strong>Gratulálunk!</strong>
   </div>
-  <div class="alert alert-success" role="alert" *ngFor="let t of finishedTasks"> <span class="glyphicon glyphicon-ok"></span> {{t.description}}</div>
+  <div class="alert alert-success" role="alert" *ngFor="let t of finishedTasks"> <span class="glyphicon glyphicon-ok"></span> <div [innerHTML]="t.description"></div></div>
 </div>

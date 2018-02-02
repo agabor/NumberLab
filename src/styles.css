@@ -1,1 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+.color-sample {
+  width: 90px;
+  height: 20px;
+  display: inline-block;
+  border: 1px solid darkgray;
+}

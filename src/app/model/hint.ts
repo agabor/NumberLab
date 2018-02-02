@@ -1,8 +1,9 @@
 
 import {TaskField} from './taskfield';
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 export class Hint {
-  constructor(public field: TaskField, public expected: any, public actual: any, public type: string) {
+  constructor(public field: TaskField, public expected: string, public actual: string, public type: string) {
 
   }
 

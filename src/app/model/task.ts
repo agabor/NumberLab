@@ -1,11 +1,12 @@
 
 import {Sheet} from './sheet';
 import {FormatTaskField, TaskField} from './taskfield';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 
 export class Task {
   attempted = false;
-  style: any = null;
-  get errorMessage(): string {
+  description: SafeHtml = null;
+  get errorMessage(): SafeHtml {
     let result = '';
     for (const field of this.fields) {
       for (const hint of field.hints) {
@@ -15,15 +16,26 @@ export class Task {
         result += hint;
       }
     }
-    return result;
+    return this.sanitizer.bypassSecurityTrustHtml(result);
   }
 
-  constructor(public description: string, public fields: TaskField[]) {
+  constructor(descriptionTemplate: string, public fields: TaskField[], private sanitizer: DomSanitizer = null) {
+    const styles: string[] = [];
     for (const field of this.fields) {
       if (field instanceof FormatTaskField) {
-        this.style = (<FormatTaskField>field).style;
-        break;
+        const formatTaskField = (<FormatTaskField>field);
+        styles.push(formatTaskField.style);
       }
+    }
+
+    if (sanitizer) {
+      for (const style of styles) {
+        descriptionTemplate = descriptionTemplate.replace('[', '<span style="' + style + '">');
+        descriptionTemplate = descriptionTemplate.replace(']', '</span>');
+      }
+      this.description = sanitizer.bypassSecurityTrustHtml(descriptionTemplate);
+    } else {
+      this.description = descriptionTemplate;
     }
   }
 

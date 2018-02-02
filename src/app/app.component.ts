@@ -18,19 +18,22 @@ export class AppComponent {
   private _spreadsheetId = null;
   gapi: any = null;
   loader: SheetLoader = new SheetLoader;
-  section: Section = new Section('Alapok', 'Most megtanuljuk az alapokat', [
-    new Task('Írd az A1-es cellába hogy "oszlop1" és a B1-es cellába hogy "oszlop2"',
-      [new ValueTaskField(0, 0, 'oszlop1'), new ValueTaskField(1, 0, 'oszlop2')]),
-    new Task('Színezd mindkét cella hátterét zöldre!',
-      [new FormatTaskField(0, 0, {backgroundColor: new Color(0, 1, 0)}), new FormatTaskField(1, 0, {backgroundColor: new Color(0, 1, 0)})]),
-    new Task('Írj egy 1-est az A2 cellába, és egy 2-est a B2 cellába!', [new ValueTaskField(0, 1, '1'), new ValueTaskField(1, 1, '2')]),
-    new Task('Számítsd ki az A1 és a B1 cella értékét a C2-es cellába!', [new FormulaTaskField(2, 1, ['=A1+B1', '=B1+A1'])])
-  ]);
+  section: Section;
   activeTask: Task = null;
   finishedTasks: Task[] = [];
   index = 0;
 
   constructor(private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) {
+    this.section = new Section('Alapok', 'Most megtanuljuk az alapokat', [
+      new Task('Írd az A1-es cellába hogy "oszlop1" és a B1-es cellába hogy "oszlop2"',
+        [new ValueTaskField(0, 0, 'oszlop1'), new ValueTaskField(1, 0, 'oszlop2')]),
+      new Task('Színezd az A1 cella hátterét [zöldre] és a B1 cella hátterét [kékre]!',
+        [new FormatTaskField(0, 0, {backgroundColor: new Color(0, 1, 0)}),
+          new FormatTaskField(1, 0, {backgroundColor: new Color(0, 0, 1)})],
+        sanitizer),
+      new Task('Írj egy 1-est az A2 cellába, és egy 2-est a B2 cellába!', [new ValueTaskField(0, 1, '1'), new ValueTaskField(1, 1, '2')]),
+      new Task('Számítsd ki az A1 és a B1 cella értékét a C2-es cellába!', [new FormulaTaskField(2, 1, ['=A1+B1', '=B1+A1'])])
+    ]);
   }
 
   showHints() {
@@ -87,6 +90,7 @@ export class AppComponent {
         this.activeTask = t;
         break;
       } else {
+        t.attempted = true;
         this.finishedTasks.unshift(t);
       }
     }

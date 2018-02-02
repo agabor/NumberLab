@@ -2,6 +2,7 @@
 import {Hint} from './hint';
 import {Format} from './format';
 import {Field} from './field';
+import {Color} from './color';
 
 export abstract class TaskField {
   hints: Hint[] = [];
@@ -13,7 +14,7 @@ export abstract class TaskField {
 
 
   public toString() {
-    return String.fromCharCode('A'.charCodeAt(0) + this.column) + this.row;
+    return String.fromCharCode('A'.charCodeAt(0) + this.column) + (this.row + 1);
   }
 }
 
@@ -26,7 +27,11 @@ export class ValueTaskField extends TaskField {
 
   check(field: Field): boolean {
     this.hints = [];
-    if (!field || this.value !== field.value) {
+    if (!field) {
+      this.hints.push(new Hint(this, this.value, null, 'értéket'));
+      return false;
+    }
+    if (this.value !== field.value) {
       this.hints.push(new Hint(this, this.value, field.value, 'értéket'));
       return false;
     }
@@ -36,6 +41,7 @@ export class ValueTaskField extends TaskField {
 }
 
 export class FormulaTaskField extends TaskField {
+
 
   constructor(public column: number, public row: number, public formulas: string[]) {
     super(column, row);
@@ -52,9 +58,9 @@ export class FormulaTaskField extends TaskField {
           return true;
         }
       }
-      this.hints.push(new Hint(this, this.formulas, field.formula, 'formulák egyikét'));
+      this.hints.push(new Hint(this, this.formulas[0], field.formula, 'formulák egyikét'));
     }
-    this.hints.push(new Hint(this, this.formulas, null, 'formulák egyikét'));
+    this.hints.push(new Hint(this, this.formulas[0], null, 'formulák egyikét'));
     return false;
   }
 
@@ -71,25 +77,57 @@ export class FormatTaskField extends TaskField {
   check(field: Field): boolean {
     this.hints = [];
     if (field) {
-      const actualBG = field.format.backgroundColor;
-      const expectedBG = this.format.backgroundColor;
-      if (expectedBG && !actualBG.isSimilarTo(expectedBG)) {
-        this.hints.push(new Hint(this, expectedBG, actualBG, 'háttérszínt'));
-        return false;
+      if (this.fits(field)) {
+        return true;
       }
-      const actualFG = field.format.backgroundColor;
-      const expectedFG = this.format.backgroundColor;
-      if (expectedFG && !actualFG.isSimilarTo(expectedFG)) {
-        this.hints.push(new Hint(this, expectedFG, actualFG, 'szövegszínt'));
-        return false;
-      }
-      return true;
+      this.hints.push(new Hint(this, this.getHTMLSample(this.format, field.value), this.getHTMLSample(field.format, field.value), '...'));
     }
     return false;
   }
 
-  get style(): any {
-    return {'background-color': this.format.backgroundColor.html};
+  fits(field: Field): boolean {
+    const actualBG = field.format.backgroundColor;
+    const expectedBG = this.format.backgroundColor;
+    if (expectedBG && !actualBG.isSimilarTo(expectedBG)) {
+      return false;
+    }
+    const actualFG = field.format.backgroundColor;
+    const expectedFG = this.format.backgroundColor;
+    if (expectedFG && !actualFG.isSimilarTo(expectedFG)) {
+      return false;
+    }
+    return true;
+  }
+
+  getHTMLSample(format: Format, content: string): string {
+    return '<div class="color-sample" ' +
+      'style="' +
+      'background-color: ' + this.bgColorDisplay(format).html + '; ' +
+      'color: ' + this.fgColorDisplay(format).html +
+      '">' +
+      content +
+      '</div>';
+  }
+
+
+
+  bgColorDisplay(format: Format): Color {
+    if (format.backgroundColor) {
+      return format.backgroundColor;
+    }
+    return new Color(1, 1, 1);
+  }
+  fgColorDisplay(format: Format): Color {
+    if (format.foregroundColor) {
+      return format.foregroundColor;
+    }
+    return new Color(0, 0, 0);
+  }
+
+  get style(): string {
+    const color = this.format.backgroundColor;
+    const gray = color.red * 0.21 + color.green * 0.72 + color. blue * 0.07;
+    return 'background-color: ' + color.html + '; color: ' + (gray > 0.5 ? '#000000' : '#ffffff') + ';';
   }
 }
 
