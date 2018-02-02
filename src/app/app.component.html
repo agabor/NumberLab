@@ -6,14 +6,22 @@
     <iframe *ngIf="_spreadsheetId != null" [src]='sheetURL()' (load)="loaded = true" [hidden]="!loaded"></iframe>
     <div class="loader" [hidden]="loaded"></div>
   </div>
-  <div class="alert {{activeTask.attempted ? 'alert-danger' : 'alert-info'}} active-task" role="alert" *ngIf="activeTask != null">
-    <span *ngIf="activeTask.attempted" class="glyphicon glyphicon-remove"></span>
-    <span *ngIf="!activeTask.attempted" class="glyphicon glyphicon-pencil"></span>
-    <div [innerHTML]="activeTask.description"></div>
-    <div *ngIf="activeTask.style" style="{{activeTask.style}}">hello</div>
-    <button class="btn-primary" (click)="checkTask()" style="display: block; float: right;" >Check</button>
-    <button class="btn-primary" (click)="showHints()" [hidden]="!activeTask.attempted || hintsShown">Show Hint</button>
-    <div *ngIf="activeTask.attempted" [hidden]="!hintsShown" [innerHTML]="activeTask.errorMessage"></div>
+  <div class="card-deck mb-3 text-center active-task">
+    <div class="card mb-4 box-shadow">
+      <div class="card-header">
+        <h4 class="my-0 font-weight-normal">
+          <span *ngIf="activeTask.attempted" class="fas fa-exclamation"></span>
+          <span *ngIf="!activeTask.attempted" class="fas fa-pencil-alt"></span>
+          Free
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="card-title pricing-card-title"  [innerHTML]="activeTask.description"></div>
+        <button type="button" class="btn btn-lg btn-block btn-outline-primary" (click)="showHints()" [hidden]="!activeTask.attempted || hintsShown">Show Hint</button>
+        <div *ngIf="activeTask.attempted" class="alert alert-info" [hidden]="!hintsShown" [innerHTML]="activeTask.errorMessage"></div>
+        <button type="button" class="btn btn-lg btn-block btn-outline-primary" (click)="checkTask()">Check</button>
+      </div>
+    </div>
   </div>
   <div class="alert alert-success active-task" role="alert" *ngIf="activeTask == null">
     <strong>Gratulálunk!</strong>
