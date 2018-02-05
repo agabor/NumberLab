@@ -6,7 +6,7 @@
     <iframe *ngIf="_spreadsheetId != null" [src]='sheetURL()' (load)="loaded = true" [hidden]="!loaded"></iframe>
     <div class="loader" [hidden]="loaded"></div>
   </div>
-  <div class="card-deck mb-3 text-center active-task">
+  <div class="card-deck mb-3 text-center active-task" *ngIf="activeTask != null">
     <div class="card mb-4 box-shadow">
       <div class="card-header">
         <h4 class="my-0 font-weight-normal">

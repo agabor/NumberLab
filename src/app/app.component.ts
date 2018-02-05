@@ -27,6 +27,26 @@ export class AppComponent {
 
   constructor(private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) {
     this.section = new Section('Alapok', 'Most megtanuljuk az alapokat', [
+      ['Megyék', 'Alma', 'Körte', 'Cseresznye', 'Meggy', 'Szilva', 'Kajszi', 'Õszibarack'],
+      ['Pest', 25066, 659, 1026, 3951, 4470, 4212, 8748],
+      ['Fejér', 4932, 706, 857, 2208, 2245, 2335, 5350],
+      ['Komárom-Esztergom', 1345, 87, 152, 190, 453, 560, 536],
+      ['Veszprém', 6060, 310, 441, 3198, 289, 367, 278],
+      ['Gyõr-Moson-Sopron', 7024, 1077, 574, 1146, 1805, 745, 308],
+      ['Vas', 8700, 502, 85, 288, 348, 22, 5],
+      ['Zala', 31479, 5500, 123, 70, 382, 22, 101],
+      ['Baranya', 1822, 174, 134, 1148, 1082, 336, 1510],
+      ['Somogy', 9438, 853, 430, 1756, 928, 1114, 3220],
+      ['Tolna', 2832, 420, 489, 555, 522, 1659, 2061],
+      ['Borsod-Abaúj-Zemplén', 28105, 2510, 312, 1864, 4658, 11059, 549],
+      ['Heves', 6290, 479, 359, 2644, 1310, 1601, 1902],
+      ['Nógrád', 2800, 245, 130, 400, 580, 120, 69],
+      ['Hajdú-Bihar', 25400, 750, 187, 2434, 2684, 349, 796],
+      ['Jász-Nagykun-Szolnok', 116, 376, 451, 1020, 1276, 158, 214],
+      ['Szabolcs-Szatmár-Bereg', 286000, 1100, 340, 16870, 11000, 155, 1215],
+      ['Bács-Kiskun', 50174, 1970, 332, 6314, 4365, 5100, 2343],
+      ['Békés', 1106, 356, 420, 676, 5110, 20, 140],
+      ['Csongrád', 4516, 226, 86, 1400, 1539, 411, 1582]], [
       new Task('Írd az A1-es cellába hogy "oszlop1" és a B1-es cellába hogy "oszlop2"',
         [new ValueTaskField(0, 0, 'oszlop1'), new ValueTaskField(1, 0, 'oszlop2')]),
       new Task('Színezd az A1 cella hátterét [zöldre] és a B1 cella hátterét [kékre]!',
@@ -60,10 +80,8 @@ export class AppComponent {
     if (isSignedIn) {
       self._spreadsheetId = localStorage.getItem('spreadsheetId');
       if (!self._spreadsheetId) {
-        this.gapi.client.sheets.spreadsheets.create({
-          'properties': {'title': this.section.title}
-        }).then(function (response) {
-          self._spreadsheetId = response.result.spreadsheetId;
+        this.section.create(this.gapi, function (id: string) {
+          self._spreadsheetId = id;
           localStorage.setItem('spreadsheetId', self._spreadsheetId);
           self.checkTask();
           self.cdr.detectChanges();
