@@ -2,7 +2,7 @@
 import {Sheet} from './sheet';
 import {TaskField} from './taskfield';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
-import {FormatTaskField} from './formattaskfield';
+import {DisplayTaskField} from './displaytaskfield';
 
 export class Task {
   attempted = false;
@@ -23,8 +23,8 @@ export class Task {
   constructor(descriptionTemplate: string, public fields: TaskField[], private sanitizer: DomSanitizer = null) {
     const styles: string[] = [];
     for (const field of this.fields) {
-      if (field instanceof FormatTaskField) {
-        const formatTaskField = (<FormatTaskField>field);
+      if (field instanceof DisplayTaskField) {
+        const formatTaskField = (<DisplayTaskField>field);
         styles.push(formatTaskField.style);
       }
     }

@@ -1,19 +1,14 @@
+import {TaskRange} from './taskrange';
 
-import {Format} from './format';
-import {Field} from './field';
-import {Color} from './color';
-
-export abstract class TaskField {
+export abstract class TaskField extends TaskRange {
 
   public hint: string = null;
 
   constructor(public column: number, public row: number) {
+    super(column, row, column, row);
   }
 
-  abstract check(field: Field): boolean;
-
-
   public toString() {
-    return String.fromCharCode('A'.charCodeAt(0) + this.column) + (this.row + 1);
+    return TaskRange.stringCoords(this.column, this.row);
   }
 }

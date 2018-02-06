@@ -1,8 +1,8 @@
 
-import {Format} from './format';
+import {Display} from './display';
 
 export class Field {
   value: string;
   formula: string;
-  format: Format;
+  display: Display;
 }

@@ -1,11 +1,11 @@
 import {TaskField} from './taskfield';
-import {Format} from './format';
+import {Display} from './display';
 import {Field} from './field';
 import {Color} from './color';
 
-export class FormatTaskField extends TaskField {
+export class DisplayTaskField extends TaskField {
 
-  constructor(public column: number, public row: number, public format: Format) {
+  constructor(public column: number, public row: number, public format: Display) {
     super(column, row);
   }
 
@@ -16,12 +16,12 @@ export class FormatTaskField extends TaskField {
       if (this.fits(field)) {
         return true;
       }
-      this.hint = this.getHint(field.value, field.format);
+      this.hint = this.getHint(field.value, field.display);
     }
     return false;
   }
 
-  public getHint(content: string, actual: Format): string {
+  public getHint(content: string, actual: Display): string {
     let result = `A(z) ${this} cellának így kellene kinéznie: ${this.getHTMLSample(this.format, content)}. `;
     if (actual) {
       result += `Most ilyen: ${this.getHTMLSample(actual, content)}`;
@@ -30,12 +30,12 @@ export class FormatTaskField extends TaskField {
   }
 
   fits(field: Field): boolean {
-    const actualBG = field.format.backgroundColor;
+    const actualBG = field.display.backgroundColor;
     const expectedBG = this.format.backgroundColor;
     if (expectedBG && !actualBG.isSimilarTo(expectedBG)) {
       return false;
     }
-    const actualFG = field.format.backgroundColor;
+    const actualFG = field.display.backgroundColor;
     const expectedFG = this.format.backgroundColor;
     if (expectedFG && !actualFG.isSimilarTo(expectedFG)) {
       return false;
@@ -43,7 +43,7 @@ export class FormatTaskField extends TaskField {
     return true;
   }
 
-  getHTMLSample(format: Format, content: string): string {
+  getHTMLSample(format: Display, content: string): string {
     return '<div class="color-sample" ' +
       'style="' +
       'background-color: ' + this.bgColorDisplay(format).html + '; ' +
@@ -55,13 +55,13 @@ export class FormatTaskField extends TaskField {
 
 
 
-  bgColorDisplay(format: Format): Color {
+  bgColorDisplay(format: Display): Color {
     if (format.backgroundColor) {
       return format.backgroundColor;
     }
     return new Color(1, 1, 1);
   }
-  fgColorDisplay(format: Format): Color {
+  fgColorDisplay(format: Display): Color {
     if (format.foregroundColor) {
       return format.foregroundColor;
     }

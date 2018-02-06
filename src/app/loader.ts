@@ -1,7 +1,7 @@
 
 import {Sheet} from './model/sheet';
 import {Color} from './model/color';
-import {Format} from './model/format';
+import {Display} from './model/display';
 import {Field} from './model/field';
 
 export class SheetLoader {
@@ -21,7 +21,7 @@ export class SheetLoader {
 
 
   private static parseFormat(effectiveFormat: any) {
-    const format = new Format;
+    const format = new Display;
     if (effectiveFormat) {
       const bgcolor = effectiveFormat.backgroundColor;
       format.backgroundColor = new Color(bgcolor.red || 0, bgcolor.green || 0, bgcolor.blue || 0);
@@ -50,7 +50,7 @@ export class SheetLoader {
             const field = new Field();
             field.value = cell.formattedValue || '';
             field.formula = SheetLoader.parseFormula(cell);
-            field.format = SheetLoader.parseFormat(cell.effectiveFormat);
+            field.display = SheetLoader.parseFormat(cell.effectiveFormat);
             row.push(field);
           }
         }

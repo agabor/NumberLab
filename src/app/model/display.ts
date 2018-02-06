@@ -1,7 +1,7 @@
 
 import {Color} from './color';
 
-export class Format {
+export class Display {
   backgroundColor?: Color = null;
   foregroundColor?: Color = null;
   bold?: boolean = null;
