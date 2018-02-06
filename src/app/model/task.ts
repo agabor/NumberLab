@@ -1,8 +1,8 @@
 
 import {Sheet} from './sheet';
-import {TaskField} from './taskfield';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 import {DisplayTaskField} from './displaytaskfield';
+import {TaskRange} from './taskrange';
 
 export class Task {
   attempted = false;
@@ -17,10 +17,13 @@ export class Task {
         result += field.hint;
       }
     }
-    return this.sanitizer.bypassSecurityTrustHtml(result);
+    if (this.sanitizer) {
+      return this.sanitizer.bypassSecurityTrustHtml(result);
+    }
+    return result;
   }
 
-  constructor(descriptionTemplate: string, public fields: TaskField[], private sanitizer: DomSanitizer = null) {
+  constructor(descriptionTemplate: string, public fields: TaskRange[], private sanitizer: DomSanitizer = null) {
     const styles: string[] = [];
     for (const field of this.fields) {
       if (field instanceof DisplayTaskField) {
@@ -42,8 +45,15 @@ export class Task {
 
   check(sheet: Sheet): boolean {
     for (const field of this.fields) {
-      if (!field.check(sheet.getField(field))) {
-        return false;
+      for (let row = field.row0; row <= field.row1; ++row) {
+        for (let column = field.column0; column <= field.column1; ++column) {
+          const f = sheet.getField(column, row);
+          if (f) {
+            if (!field.check(f)) {
+              return false;
+            }
+          }
+        }
       }
     }
     return true;

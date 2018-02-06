@@ -40,17 +40,25 @@ export class SheetLoader {
 
     this.gapi.client.sheets.spreadsheets.get({
       spreadsheetId: spreadsheetId,
-      ranges: ['Sheet1!A1:E10'],
+      ranges: ['Sheet1!A1:Z100'],
       includeGridData: true
     }).then(function (response) {
       for (const data of response.result.sheets[0].data[0].rowData) {
         const row: Field[] = [];
         if (data.values) {
           for (const cell of data.values) {
-            const field = new Field();
+            const field = new Field(row.length, sheet.fields.length);
             field.value = cell.formattedValue || '';
             field.formula = SheetLoader.parseFormula(cell);
             field.display = SheetLoader.parseFormat(cell.effectiveFormat);
+
+            const userEnteredFormat = cell.userEnteredFormat;
+            if (userEnteredFormat) {
+              const numberFormat = userEnteredFormat.numberFormat;
+              if (numberFormat) {
+                field.format = numberFormat.pattern;
+              }
+            }
             row.push(field);
           }
         }

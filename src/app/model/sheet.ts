@@ -6,13 +6,14 @@ export class Sheet {
   fields: Field[][] = [];
 
 
-  getField(field: TaskField): Field {
+  getField(column: number, row: number): Field {
     if (this.fields) {
-      const row = this.fields[field.row];
-      if (row) {
-        return row[field.column];
+      const rowData = this.fields[row];
+      if (rowData) {
+        return rowData[column];
       }
     }
+    return new Field(column, row);
   }
 
 }

@@ -8,7 +8,14 @@ export class FormatTaskRange extends TaskRange {
   }
 
   check(field: Field): boolean {
-    return undefined;
+    if (field.format !== this.format) {
+      this.hint = `A(z) ${field} mezőn a következő formátumot kell beállítani: ${this.format}`;
+      if (field.format) {
+        this.hint += `, ehelyett a következő van megadva: ${field.format}`;
+      }
+      return false;
+    }
+    return true;
   }
 
 }

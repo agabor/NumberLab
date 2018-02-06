@@ -8,7 +8,7 @@ export abstract class TaskRange {
   }
 
 
-  protected static stringCoords(column: number, row: number) {
+  public static stringCoords(column: number, row: number) {
     return String.fromCharCode('A'.charCodeAt(0) + column) + (row + 1);
   }
 

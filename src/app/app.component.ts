@@ -8,6 +8,7 @@ import {Color} from './model/color';
 import {ValueTaskField} from './model/valuetaskfield';
 import {DisplayTaskField} from './model/displaytaskfield';
 import {FormulaTaskField} from './model/formulataskfield';
+import {FormatTaskRange} from './model/formattaskrange';
 
 @Component({
   selector: 'app-root',
@@ -26,7 +27,7 @@ export class AppComponent {
   index = 0;
 
   constructor(private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) {
-    this.section = new Section('Alapok', 'Most megtanuljuk az alapokat', [
+    this.section = new Section('INFORMATIKA KÖZÉPSZINTŰ GYAKORLATI VIZSGA 2005', '', [
       ['Megyék', 'Alma', 'Körte', 'Cseresznye', 'Meggy', 'Szilva', 'Kajszi', 'Õszibarack'],
       ['Pest', 25066, 659, 1026, 3951, 4470, 4212, 8748],
       ['Fejér', 4932, 706, 857, 2208, 2245, 2335, 5350],
@@ -47,6 +48,8 @@ export class AppComponent {
       ['Bács-Kiskun', 50174, 1970, 332, 6314, 4365, 5100, 2343],
       ['Békés', 1106, 356, 420, 676, 5110, 20, 140],
       ['Csongrád', 4516, 226, 86, 1400, 1539, 411, 1582]], [
+        new Task('A gyümölcsök termésmennyisége tonnában van megadva. Állítson be ezekre az értékekre ' +
+      'ezres tagolású számformátumot, a számok után a „t” jelöléssel.', [new FormatTaskRange(1, 1, 7, 19, '# ##0 t')]),
       new Task('Írd az A1-es cellába hogy "oszlop1" és a B1-es cellába hogy "oszlop2"',
         [new ValueTaskField(0, 0, 'oszlop1'), new ValueTaskField(1, 0, 'oszlop2')]),
       new Task('Színezd az A1 cella hátterét [zöldre] és a B1 cella hátterét [kékre]!',
