@@ -18,7 +18,6 @@ import {FormatTaskRange} from './model/formattaskrange';
 export class AppComponent {
   loaded = false;
   hintsShown = false;
-  private _spreadsheetId = null;
   gapi: any = null;
   loader: SheetLoader = new SheetLoader;
   section: Section;
@@ -50,8 +49,9 @@ export class AppComponent {
       ['Csongrád', 4516, 226, 86, 1400, 1539, 411, 1582]], [
         new Task('A gyümölcsök termésmennyisége tonnában van megadva. Állítson be ezekre az értékekre ' +
       'ezres tagolású számformátumot, a számok után a „t” jelöléssel.', [new FormatTaskRange(1, 1, 7, 19, '# ##0 t')]),
-      new Task('Írd az A1-es cellába hogy "oszlop1" és a B1-es cellába hogy "oszlop2"',
-        [new ValueTaskField(0, 0, 'oszlop1'), new ValueTaskField(1, 0, 'oszlop2')]),
+      new Task('Az első és második oszlop közé szúrjon be egy oszlopot. Az oszlop első sorába írja be az ' +
+        '„Összes gyümölcstermés” szöveget! ',
+        [new ValueTaskField(1, 0, 'Összes gyümölcstermés'), new FormatTaskRange(1, 1, 7, 19, '# ##0 t')]),
       new Task('Színezd az A1 cella hátterét [zöldre] és a B1 cella hátterét [kékre]!',
         [new DisplayTaskField(0, 0, {backgroundColor: new Color(0, 1, 0)}),
           new DisplayTaskField(1, 0, {backgroundColor: new Color(0, 0, 1)})],
@@ -59,6 +59,35 @@ export class AppComponent {
       new Task('Írj egy 1-est az A2 cellába, és egy 2-est a B2 cellába!', [new ValueTaskField(0, 1, '1'), new ValueTaskField(1, 1, '2')]),
       new Task('Számítsd ki az A1 és a B1 cella értékét a C2-es cellába!', [new FormulaTaskField(2, 1, ['=A1+B1', '=B1+A1'])])
     ]);
+
+    if (!AppComponent.TaskIndex) {
+      AppComponent.TaskIndex = 0;
+    }
+  }
+
+
+  get SpreadsheetID(): string {
+    return AppComponent.SpreadsheetID;
+  }
+
+
+  static get SpreadsheetID(): string {
+    return localStorage.getItem('spreadsheetId');
+  }
+
+
+  static set SpreadsheetID(value: string) {
+    localStorage.setItem('spreadsheetId', value);
+  }
+
+
+  static get TaskIndex(): number {
+    return +localStorage.getItem('taskidx');
+  }
+
+
+  static set TaskIndex(value: number) {
+    localStorage.setItem('taskidx', value.toString());
   }
 
   showHints() {
@@ -81,20 +110,26 @@ export class AppComponent {
   updateSigninStatus(isSignedIn) {
     const self = this;
     if (isSignedIn) {
-      self._spreadsheetId = localStorage.getItem('spreadsheetId');
-      if (!self._spreadsheetId) {
+      if (!AppComponent.SpreadsheetID) {
         this.section.create(this.gapi, function (id: string) {
-          self._spreadsheetId = id;
-          localStorage.setItem('spreadsheetId', self._spreadsheetId);
-          self.checkTask();
+          AppComponent.SpreadsheetID = id;
+          self.setTasks();
           self.cdr.detectChanges();
         });
       } else {
-        this.checkTask();
+        this.setTasks();
       }
     } else {
       this.gapi.auth2.getAuthInstance().signIn();
     }
+  }
+
+  private setTasks() {
+    this.finishedTasks = [];
+    for (let i = 0; i < AppComponent.TaskIndex; ++i) {
+      this.finishedTasks.push(this.section.tasks[i]);
+    }
+    this.activeTask = this.section.tasks[AppComponent.TaskIndex];
   }
 
   checkTask() {
@@ -102,7 +137,7 @@ export class AppComponent {
       this.activeTask.attempted = true;
     }
     this.loader.onLoaded = (sheets) => this.checkTasks(sheets);
-    this.loader.load(this._spreadsheetId);
+    this.loader.load(AppComponent.SpreadsheetID);
   }
 
   checkTasks(sheet: Sheet) {
@@ -134,6 +169,6 @@ export class AppComponent {
 
   sheetURL() {
     return this.sanitizer.bypassSecurityTrustResourceUrl('https://docs.google.com/spreadsheets/d/' +
-      this._spreadsheetId + '/edit?rm=embedded#gid=0');
+      AppComponent.SpreadsheetID + '/edit?rm=embedded#gid=0');
   }
 }
