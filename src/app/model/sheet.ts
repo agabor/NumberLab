@@ -1,5 +1,3 @@
-
-import {TaskField} from './taskfield';
 import {Field} from './field';
 
 export class Sheet {

@@ -1,14 +1,16 @@
-import {TaskRange} from './taskrange';
+import {Field} from './field';
+import {Range} from './range';
 
-export abstract class TaskField extends TaskRange {
+export abstract class TaskField {
 
   public hint: string = null;
 
-  constructor(public column: number, public row: number) {
-    super(column, row, column, row);
+  constructor(public range: Range) {
   }
 
+  abstract check(field: Field): boolean;
+
   public toString() {
-    return TaskRange.stringCoords(this.column, this.row);
+    return this.range.toString();
   }
 }

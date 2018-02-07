@@ -1,10 +1,11 @@
-import {TaskRange} from './taskrange';
 import {Field} from './field';
+import {TaskField} from './taskfield';
+import {Range} from './range';
 
-export class FormatTaskRange extends TaskRange {
+export class FormatTaskRange extends TaskField {
 
-  constructor(public column0: number, public row0: number, public column1: number, public row1: number, public format: string) {
-    super(column0, row0, column1, row1);
+  constructor(public range: Range, public format: string) {
+    super(range);
   }
 
   check(field: Field): boolean {

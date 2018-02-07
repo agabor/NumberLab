@@ -2,11 +2,12 @@ import {TaskField} from './taskfield';
 import {Display} from './display';
 import {Field} from './field';
 import {Color} from './color';
+import {Range} from './range';
 
 export class DisplayTaskField extends TaskField {
 
-  constructor(public column: number, public row: number, public format: Display) {
-    super(column, row);
+  constructor(public range: Range, public format: Display) {
+    super(range);
   }
 
 

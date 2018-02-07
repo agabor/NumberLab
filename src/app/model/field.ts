@@ -1,6 +1,6 @@
 
 import {Display} from './display';
-import {TaskRange} from './taskrange';
+import {Range} from './range';
 
 export class Field {
 
@@ -13,6 +13,6 @@ export class Field {
   display: Display;
   format: string;
   public toString() {
-    return TaskRange.stringCoords(this.column, this.row);
+    return new Range(this.column, this.row).toString();
   }
 }

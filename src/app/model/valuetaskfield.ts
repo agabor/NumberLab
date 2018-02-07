@@ -1,11 +1,12 @@
 
 import {Field} from './field';
 import {TaskField} from './taskfield';
+import {Range} from './range';
 
 export class ValueTaskField extends TaskField {
 
-  constructor(public column: number, public row: number, public value: string) {
-    super(column, row);
+  constructor(public range: Range, public value: string) {
+    super(range);
   }
 
 

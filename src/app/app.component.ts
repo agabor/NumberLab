@@ -9,6 +9,7 @@ import {ValueTaskField} from './model/valuetaskfield';
 import {DisplayTaskField} from './model/displaytaskfield';
 import {FormulaTaskField} from './model/formulataskfield';
 import {FormatTaskRange} from './model/formattaskrange';
+import {Range} from './model/range';
 
 @Component({
   selector: 'app-root',
@@ -48,16 +49,14 @@ export class AppComponent {
       ['Békés', 1106, 356, 420, 676, 5110, 20, 140],
       ['Csongrád', 4516, 226, 86, 1400, 1539, 411, 1582]], [
         new Task('A gyümölcsök termésmennyisége tonnában van megadva. Állítson be ezekre az értékekre ' +
-      'ezres tagolású számformátumot, a számok után a „t” jelöléssel.', [new FormatTaskRange(1, 1, 7, 19, '# ##0 t')]),
+      'ezres tagolású számformátumot, a számok után a „t” jelöléssel.', [new FormatTaskRange(new Range(1, 1, 7, 19), '# ##0 t')]),
       new Task('Az első és második oszlop közé szúrjon be egy oszlopot. Az oszlop első sorába írja be az ' +
         '„Összes gyümölcstermés” szöveget! ',
-        [new ValueTaskField(1, 0, 'Összes gyümölcstermés'), new FormatTaskRange(1, 1, 7, 19, '# ##0 t')]),
+        [new ValueTaskField(new Range(1, 0), 'Összes gyümölcstermés'), new FormatTaskRange(new Range(1, 1, 8, 19), '# ##0 t')]),
       new Task('Színezd az A1 cella hátterét [zöldre] és a B1 cella hátterét [kékre]!',
-        [new DisplayTaskField(0, 0, {backgroundColor: new Color(0, 1, 0)}),
-          new DisplayTaskField(1, 0, {backgroundColor: new Color(0, 0, 1)})],
-        sanitizer),
-      new Task('Írj egy 1-est az A2 cellába, és egy 2-est a B2 cellába!', [new ValueTaskField(0, 1, '1'), new ValueTaskField(1, 1, '2')]),
-      new Task('Számítsd ki az A1 és a B1 cella értékét a C2-es cellába!', [new FormulaTaskField(2, 1, ['=A1+B1', '=B1+A1'])])
+        [new DisplayTaskField(new Range(0, 0), {backgroundColor: new Color(0, 1, 0)}),
+          new DisplayTaskField(new Range(1, 0), {backgroundColor: new Color(0, 0, 1)})],
+        sanitizer)
     ]);
 
     if (!AppComponent.TaskIndex) {

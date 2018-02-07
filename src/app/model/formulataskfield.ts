@@ -1,13 +1,12 @@
 import {Field} from './field';
 import {TaskField} from './taskfield';
+import {Range} from './range';
 
 export class FormulaTaskField extends TaskField {
 
-
-  constructor(public column: number, public row: number, public formulas: string[]) {
-    super(column, row);
+  constructor(public range: Range, public formulas: string[]) {
+    super(range);
   }
-
 
   check(field: Field): boolean {
     if (field) {
