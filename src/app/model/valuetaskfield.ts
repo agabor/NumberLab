@@ -5,28 +5,28 @@ import {Range} from './range';
 
 export class ValueTaskField extends TaskField {
 
-  constructor(public range: Range, public value: string) {
+  constructor(public range: Range, public value: string[][]) {
     super(range);
   }
 
 
   check(field: Field): boolean {
     this.hint = null;
-    if (!field) {
-      this.hint = this.getHint();
-      return false;
-    }
-    if (this.value !== field.formattedValue) {
-      this.hint = this.getHint(field.formattedValue);
+    if (this.getValue(field) !== field.formattedValue) {
+      this.hint = this.getHint(field);
       return false;
     }
     return true;
   }
 
-  public getHint(actual: string = null): string {
-    let result = `A(z) ${this} cellába a következő értéket kell megadni: ${this.value}. `;
-    if (actual) {
-      result += `Most ez van benne: ${actual}`;
+  private getValue(field: Field) {
+    return this.value[field.range.row0 - this.range.row0][field.range.column0 - this.range.column0];
+  }
+
+  public getHint(field: Field): string {
+    let result = `A(z) ${field} cellába a következő értéket kell megadni: ${this.getValue(field)}. `;
+    if (field.formattedValue) {
+      result += `Most ez van benne: ${field.formattedValue}`;
     }
     return result;
   }
