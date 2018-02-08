@@ -1,8 +1,9 @@
 import {Task} from './task';
 import {isNumber} from 'util';
+import {Matrix} from "./matrix";
 
 export class Section {
-  constructor(public title: string, public description: string, private values: any[][], public tasks: Task[]) {
+  constructor(public title: string, public description: string, private values: Matrix, public tasks: Task[]) {
 
   }
 
@@ -40,7 +41,7 @@ export class Section {
 
   private getData(): object[] {
     const data = [];
-    for (const row of this.values) {
+    for (const row of this.values.data) {
       const rowData = {'values': []};
       for (const value of row) {
         if (isNumber(value)) {
