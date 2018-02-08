@@ -48,10 +48,8 @@ export class Task {
       for (let row = field.range.row0; row <= field.range.row1; ++row) {
         for (let column = field.range.column0; column <= field.range.column1; ++column) {
           const f = sheet.getField(column, row);
-          if (f) {
-            if (!field.check(f)) {
-              return false;
-            }
+          if (!field.check(f)) {
+            return false;
           }
         }
       }

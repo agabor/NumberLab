@@ -9,7 +9,10 @@ export class Sheet {
     if (this.fields) {
       const rowData = this.fields[row];
       if (rowData) {
-        return rowData[column];
+        const field = rowData[column];
+        if (field) {
+          return field;
+        }
       }
     }
     return new Field(new Range(column, row));

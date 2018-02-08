@@ -55,6 +55,9 @@ export class AppComponent {
         [new ValueTaskField(new Range(1, 0), 'Összes gyümölcstermés'), new FormatTaskRange(new Range(2, 2, 8, 19), '# ##0 t')]),
       new Task('Számítsa ki – függvény segítségével – a létrehozott oszlopba, a megyében termelt gyümölcsök mennyiségét!',
         [new FormulaTaskField(new Range(1, 1, 1, 19), [new Formula(['=SUM(', new Range(1, 0, 7, 0), ')'])])]),
+      new Task('A megyék után, egy sort hagyjon üresen, s a következő sorban számítsa ki – függvény segítségével – azt, ' +
+        'hogy az egyes gyümölcsökből mennyi termett az országban összesen! ',
+        [new FormulaTaskField(new Range(2, 21, 8, 21), [new Formula(['=SUM(', new Range(0, -20, 0, -2), ')'])])]),
       new Task('Színezd az A1 cella hátterét [zöldre] és a B1 cella hátterét [kékre]!',
         [new DisplayTaskField(new Range(0, 0), {backgroundColor: new Color(0, 1, 0)}),
           new DisplayTaskField(new Range(1, 0), {backgroundColor: new Color(0, 0, 1)})],

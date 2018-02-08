@@ -10,16 +10,14 @@ export class FormulaTaskField extends TaskField {
   }
 
   check(field: Field): boolean {
-    if (field) {
-      let formula = field.formula;
-      formula = formula.replace(/ /g, '');
-      for (const f of this.formulas) {
-        if (f.render(field) === formula) {
-          return true;
-        }
+    let formula = field.formula || '';
+    formula = formula.replace(/ /g, '');
+    for (const f of this.formulas) {
+      if (f.render(field) === formula) {
+        return true;
       }
-      this.hint = this.getHint(field);
     }
+    this.hint = this.getHint(field);
     return false;
   }
 
