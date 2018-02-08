@@ -7,8 +7,8 @@ export class Field {
   constructor(public range: Range) {
 
   }
-
-  value: string;
+  effectiveValue: number;
+  formattedValue: string;
   formula: string;
   display: Display;
   format: string;

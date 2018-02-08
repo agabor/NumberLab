@@ -16,8 +16,8 @@ export class ValueTaskField extends TaskField {
       this.hint = this.getHint();
       return false;
     }
-    if (this.value !== field.value) {
-      this.hint = this.getHint(field.value);
+    if (this.value !== field.formattedValue) {
+      this.hint = this.getHint(field.formattedValue);
       return false;
     }
     return true;

@@ -17,7 +17,7 @@ export class DisplayTaskField extends TaskField {
       if (this.fits(field)) {
         return true;
       }
-      this.hint = this.getHint(field.value, field.display);
+      this.hint = this.getHint(field.formattedValue, field.display);
     }
     return false;
   }

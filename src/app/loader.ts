@@ -49,10 +49,12 @@ export class SheetLoader {
         if (data.values) {
           for (const cell of data.values) {
             const field = new Field(new Range(row.length, sheet.fields.length));
-            field.value = cell.formattedValue || '';
+            field.formattedValue = cell.formattedValue || '';
             field.formula = SheetLoader.parseFormula(cell);
             field.display = SheetLoader.parseFormat(cell.effectiveFormat);
-
+            if (cell.effectiveValue) {
+              field.effectiveValue = cell.effectiveValue.numberValue;
+            }
             const userEnteredFormat = cell.userEnteredFormat;
             if (userEnteredFormat) {
               const numberFormat = userEnteredFormat.numberFormat;
