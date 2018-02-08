@@ -5,9 +5,9 @@ import {Range} from './range';
 export class SortedNumberColumn extends TaskField {
 
   minRow: number = null;
-  minRowValue: number = null;
+  minRowValue: any = null;
   maxRow: number = null;
-  maxRowValue: number = null;
+  maxRowValue: any = null;
 
   constructor(range: Range, public ascending: boolean) {
     super(range);

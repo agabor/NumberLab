@@ -12,6 +12,7 @@ export class FormulaTaskField extends TaskField {
   check(field: Field): boolean {
     let formula = field.formula || '';
     formula = formula.replace(/ /g, '');
+    formula = formula.replace(/[$]/g, '');
     for (const f of this.formulas) {
       if (f.render(field) === formula) {
         return true;

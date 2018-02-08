@@ -53,7 +53,7 @@ export class SheetLoader {
             field.formula = SheetLoader.parseFormula(cell);
             field.display = SheetLoader.parseFormat(cell.effectiveFormat);
             if (cell.effectiveValue) {
-              field.effectiveValue = cell.effectiveValue.numberValue;
+              field.effectiveValue = cell.effectiveValue.numberValue || cell.effectiveValue.stringValue;
             }
             const userEnteredFormat = cell.userEnteredFormat;
             if (userEnteredFormat) {

@@ -7,7 +7,7 @@ export class Field {
   constructor(public range: Range) {
 
   }
-  effectiveValue: number;
+  effectiveValue: any;
   formattedValue: string;
   formula: string;
   display: Display;
