@@ -1,10 +1,10 @@
 export class Range {
   constructor(public column0: number, public row0: number, public column1: number = null, public row1: number = null) {
-    if (!column1) {
-      column1 = column0;
+    if (!this.column1) {
+      this.column1 = column0;
     }
-    if (!row1) {
-      row1 = row0;
+    if (!this.row1) {
+      this.row1 = row0;
     }
   }
 

@@ -1,4 +1,5 @@
 import {Field} from './field';
+import {Range} from './range';
 
 export class Sheet {
   fields: Field[][] = [];
@@ -11,7 +12,7 @@ export class Sheet {
         return rowData[column];
       }
     }
-    return new Field(column, row);
+    return new Field(new Range(column, row));
   }
 
 }

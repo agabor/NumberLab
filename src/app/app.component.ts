@@ -10,6 +10,7 @@ import {DisplayTaskField} from './model/displaytaskfield';
 import {FormulaTaskField} from './model/formulataskfield';
 import {FormatTaskRange} from './model/formattaskrange';
 import {Range} from './model/range';
+import {Formula} from "./model/formula";
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,6 @@ export class AppComponent {
   section: Section;
   activeTask: Task = null;
   finishedTasks: Task[] = [];
-  index = 0;
 
   constructor(private cdr: ChangeDetectorRef, private sanitizer: DomSanitizer) {
     this.section = new Section('INFORMATIKA KÖZÉPSZINTŰ GYAKORLATI VIZSGA 2005', '', [
@@ -52,7 +52,9 @@ export class AppComponent {
       'ezres tagolású számformátumot, a számok után a „t” jelöléssel.', [new FormatTaskRange(new Range(1, 1, 7, 19), '# ##0 t')]),
       new Task('Az első és második oszlop közé szúrjon be egy oszlopot. Az oszlop első sorába írja be az ' +
         '„Összes gyümölcstermés” szöveget! ',
-        [new ValueTaskField(new Range(1, 0), 'Összes gyümölcstermés'), new FormatTaskRange(new Range(1, 1, 8, 19), '# ##0 t')]),
+        [new ValueTaskField(new Range(1, 0), 'Összes gyümölcstermés'), new FormatTaskRange(new Range(2, 2, 8, 19), '# ##0 t')]),
+      new Task('Számítsa ki – függvény segítségével – a létrehozott oszlopba, a megyében termelt gyümölcsök mennyiségét!',
+        [new FormulaTaskField(new Range(1, 1, 1, 19), [new Formula(['=SUM(', new Range(1, 0, 7, 0), ')'])])]),
       new Task('Színezd az A1 cella hátterét [zöldre] és a B1 cella hátterét [kékre]!',
         [new DisplayTaskField(new Range(0, 0), {backgroundColor: new Color(0, 1, 0)}),
           new DisplayTaskField(new Range(1, 0), {backgroundColor: new Color(0, 0, 1)})],
@@ -140,16 +142,9 @@ export class AppComponent {
   }
 
   checkTasks(sheet: Sheet) {
-    this.finishedTasks = [];
-    this.activeTask = null;
-    for (const t of this.section.tasks) {
-      if (!t.check(sheet)) {
-        this.activeTask = t;
-        break;
-      } else {
-        t.attempted = true;
-        this.finishedTasks.unshift(t);
-      }
+    this.activeTask.attempted = true;
+    if (this.activeTask.check(sheet)) {
+      this.nextTask();
     }
     this.cdr.detectChanges();
   }
@@ -158,11 +153,11 @@ export class AppComponent {
   private nextTask() {
     this.hintsShown = false;
     this.finishedTasks.unshift(this.activeTask);
-    if (this.index === this.section.tasks.length - 1) {
+    if (AppComponent.TaskIndex === this.section.tasks.length - 1) {
       this.activeTask = null;
     } else {
-      this.index += 1;
-      this.activeTask = this.section.tasks[this.index];
+      AppComponent.TaskIndex += 1;
+      this.activeTask = this.section.tasks[AppComponent.TaskIndex];
     }
   }
 

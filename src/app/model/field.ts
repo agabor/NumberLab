@@ -4,7 +4,7 @@ import {Range} from './range';
 
 export class Field {
 
-  constructor(private column: number, private row: number) {
+  constructor(public range: Range) {
 
   }
 
@@ -13,6 +13,6 @@ export class Field {
   display: Display;
   format: string;
   public toString() {
-    return new Range(this.column, this.row).toString();
+    return this.range.toString();
   }
 }
