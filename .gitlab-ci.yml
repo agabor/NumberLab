@@ -1,7 +1,9 @@
+image: trion/ng-cli-karma
 
 pages:
   stage: deploy
   script:
+  - npm install
   - ng build --prod
   artifacts:
     paths:
