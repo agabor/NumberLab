@@ -2,7 +2,7 @@
 pages:
   stage: deploy
   script:
-  - ng build
+  - ng build --prod
   artifacts:
     paths:
     - dist
