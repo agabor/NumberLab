@@ -5,10 +5,10 @@ pages:
   script:
   - npm install
   - ng build --prod
-  - mkdir public_html
-  - mv dist/* public_html
+  - mkdir public
+  - mv dist/* public
   artifacts:
     paths:
-    - public_html
+    - public
   only:
   - master
