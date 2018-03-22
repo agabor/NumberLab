@@ -4,7 +4,7 @@ pages:
   stage: deploy
   script:
   - npm install
-  - ng build --prod
+  - ng build --prod --base-href https://agabor.gitlab.io/NumberLab/
   - mkdir public
   - mv dist/* public
   artifacts:
