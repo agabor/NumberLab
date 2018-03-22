@@ -47,7 +47,7 @@ export class SortedNumberColumn extends TaskField {
   }
 
 
-  private init(row: number, value: number) {
+  private init(row: number, value: string|number) {
     this.minRow = row;
     this.minRowValue = value;
     this.maxRow = row;

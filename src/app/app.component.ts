@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, HostListener} from '@angular/core';
+import {ChangeDetectorRef, Component, HostListener, OnInit} from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
 import {Sheet} from './model/sheet';
 import {Section} from './model/section';
@@ -12,17 +12,17 @@ import {FormatTaskRange} from './model/formattaskrange';
 import {Range} from './model/range';
 import {Formula} from './model/formula';
 import {SortedNumberColumn} from './model/sortedcolumn';
-import {Matrix} from "./model/matrix";
+import {Matrix} from './model/matrix';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {
-  loaded = false;
+export class AppComponent implements OnInit {
+
+
   hintsShown = false;
-  gapi: any = null;
   loader: SheetLoader = new SheetLoader;
   section: Section;
   activeTask: Task = null;
@@ -50,15 +50,23 @@ export class AppComponent {
       ['Bács-Kiskun', 50174, 1970, 332, 6314, 4365, 5100, 2343],
       ['Békés', 1106, 356, 420, 676, 5110, 20, 140],
       ['Csongrád', 4516, 226, 86, 1400, 1539, 411, 1582]]);
+    const numeric_data = data.sub(1, 1, 7, 19);
+    const megyek = data.sub(0, 0, 0, 19);
     this.section = new Section('INFORMATIKA KÖZÉPSZINTŰ GYAKORLATI VIZSGA 2005', '', data, [
         new Task('A gyümölcsök termésmennyisége tonnában van megadva. Állítson be ezekre az értékekre ' +
-      'ezres tagolású számformátumot, a számok után a „t” jelöléssel.', [new FormatTaskRange(new Range(1, 1, 7, 19), '# ##0 t')]),
+      'ezres tagolású számformátumot, a számok után a „t” jelöléssel.', [
+        new ValueTaskField(new Range(0, 0, 7, 19), data), new FormatTaskRange(new Range(1, 1, 7, 19), '# ##0 t')]),
       new Task('Az első és második oszlop közé szúrjon be egy oszlopot. Az oszlop első sorába írja be az ' +
         '„Összes gyümölcstermés” szöveget! ',
-        [new ValueTaskField(new Range(1, 0), new Matrix([['Összes gyümölcstermés']])),
-          new FormatTaskRange(new Range(2, 2, 8, 19), '# ##0 t')]),
+        [new ValueTaskField(new Range(0, 0, 0, 19), megyek),
+          new ValueTaskField(new Range(2, 1, 8, 19), numeric_data),
+          new FormatTaskRange(new Range(2, 2, 8, 19), '# ##0 t'),
+          new ValueTaskField(new Range(1, 0), new Matrix([['Összes gyümölcstermés']]))]),
       new Task('Számítsa ki – függvény segítségével – a létrehozott oszlopba, a megyében termelt gyümölcsök mennyiségét!',
-        [new FormulaTaskField(new Range(1, 1, 1, 19), [new Formula(['=SUM(', new Range(1, 0, 7, 0), ')'])])]),
+        [new ValueTaskField(new Range(0, 0, 0, 19), megyek),
+          new ValueTaskField(new Range(2, 1, 8, 19), numeric_data),
+          new FormatTaskRange(new Range(2, 2, 8, 19), '# ##0 t'),
+          new FormulaTaskField(new Range(1, 1, 1, 19), [new Formula(['=SUM(', new Range(1, 0, 7, 0), ')'])])]),
       new Task('A megyék után, egy sort hagyjon üresen, s a következő sorban számítsa ki – függvény segítségével – azt, ' +
         'hogy az egyes gyümölcsökből mennyi termett az országban összesen!',
         [new FormulaTaskField(new Range(1, 21, 8, 21), [new Formula(['=SUM(', new Range(0, -20, 0, -2), ')'])])]),
@@ -102,6 +110,50 @@ export class AppComponent {
     }
   }
 
+  /**
+   *  On load, called to load the auth2 library and API client library.
+   */
+  handleClientLoad() {
+    const self = this;
+    console.log('handleClientLoad');
+    gapi.load('client:auth2', function() {
+      self.initClient();
+    });
+  }
+
+  /**
+   *  Initializes the API client library and sets up sign-in state
+   *  listeners.
+   */
+  initClient() {
+    const self = this;
+    // Client ID and API key from the Developer Console
+    const CLIENT_ID = '8401109384-9vgun9cicdbbnasprfeeta92sq3k5vbm.apps.googleusercontent.com';
+    const API_KEY = 'AIzaSyC4zMvcnbjNbbyfKgIw1Y2rvlIP_UKdl-4';
+
+    // Array of API discovery doc URLs for APIs used by the quickstart
+    const DISCOVERY_DOCS = ['https://sheets.googleapis.com/$discovery/rest?version=v4'];
+
+    // Authorization scopes required by the API; multiple scopes can be
+    // included, separated by spaces.
+    const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+    console.log('initClient');
+    gapi.client.init({
+      apiKey: API_KEY,
+      clientId: CLIENT_ID,
+      discoveryDocs: DISCOVERY_DOCS,
+      scope: SCOPES
+    }).then(function () {
+      console.log('loaded');
+      // Listen for sign-in state changes.
+      const authInstance = gapi.auth2.getAuthInstance();
+      console.log(authInstance);
+      authInstance.isSignedIn.listen(status => self.updateSigninStatus(status));
+
+      // Handle the initial sign-in state.
+      self.updateSigninStatus(authInstance.isSignedIn.get());
+    });
+  }
 
   get SpreadsheetID(): string {
     return AppComponent.SpreadsheetID;
@@ -131,16 +183,9 @@ export class AppComponent {
     this.hintsShown = true;
     this.cdr.detectChanges();
   }
-
-  @HostListener('window:sheets-api-loaded', ['$event'])
-  sheetsAPILoaded(event) {
-    this.gapi = window['gapi'];
-    this.loader.gapi = this.gapi;
-    // Listen for sign-in state changes.
-    this.gapi.auth2.getAuthInstance().isSignedIn.listen(status => this.updateSigninStatus(status));
-
-    // Handle the initial sign-in state.
-    this.updateSigninStatus(this.gapi.auth2.getAuthInstance().isSignedIn.get());
+  ngOnInit() {
+    console.log(gapi);
+    this.handleClientLoad();
 
   }
 
@@ -148,7 +193,7 @@ export class AppComponent {
     const self = this;
     if (isSignedIn) {
       if (!AppComponent.SpreadsheetID) {
-        this.section.create(this.gapi, function (id: string) {
+        this.section.create(gapi, function (id: string) {
           AppComponent.SpreadsheetID = id;
           self.setTasks();
           self.cdr.detectChanges();
@@ -157,11 +202,12 @@ export class AppComponent {
         this.setTasks();
       }
     } else {
-      this.gapi.auth2.getAuthInstance().signIn();
+      gapi.auth2.getAuthInstance().signIn();
     }
   }
 
   private setTasks() {
+    console.log('setTasks');
     this.finishedTasks = [];
     for (let i = 0; i < AppComponent.TaskIndex; ++i) {
       this.finishedTasks.push(this.section.tasks[i]);
@@ -170,14 +216,18 @@ export class AppComponent {
   }
 
   checkTask() {
+
+    console.log('checkTask');
     if (this.activeTask) {
       this.activeTask.attempted = true;
     }
+    console.log('>>gapi.client.sheets.spreadsheets.get');
     this.loader.onLoaded = (sheets) => this.checkTasks(sheets);
     this.loader.load(AppComponent.SpreadsheetID);
   }
 
   checkTasks(sheet: Sheet) {
+    console.log('checkTasks');
     this.activeTask.attempted = true;
     if (this.activeTask.check(sheet)) {
       this.nextTask();

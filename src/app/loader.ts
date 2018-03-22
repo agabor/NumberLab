@@ -6,7 +6,6 @@ import {Field} from './model/field';
 import {Range} from './model/range';
 
 export class SheetLoader {
-  gapi: any = null;
   onLoaded: (sheet: Sheet) => void;
 
   private static parseFormula(cell): string {
@@ -39,11 +38,13 @@ export class SheetLoader {
     const sheet = new Sheet();
     const self = this;
 
-    this.gapi.client.sheets.spreadsheets.get({
+    console.log('gapi.client.sheets.spreadsheets.get');
+    gapi.client.sheets.spreadsheets.get({
       spreadsheetId: spreadsheetId,
-      ranges: ['Sheet1!A1:Z100'],
+      ranges: ['Sheet1!A1:H20'],
       includeGridData: true
     }).then(function (response) {
+      console.log(response);
       for (const data of response.result.sheets[0].data[0].rowData) {
         const row: Field[] = [];
         if (data.values) {
