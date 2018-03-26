@@ -2,7 +2,7 @@ import {Field} from './field';
 import {Range} from './range';
 
 export class Formula {
-  constructor(public parts: any[]) {
+  constructor(public parts: (string|Range)[]) {
 
   }
 
