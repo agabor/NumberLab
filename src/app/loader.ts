@@ -3,7 +3,6 @@ import {Sheet} from './model/sheet';
 import {Color} from './model/color';
 import {Display} from './model/display';
 import {Field} from './model/field';
-import {Range} from './model/range';
 
 export class SheetLoader {
   onLoaded: (sheet: Sheet) => void;
@@ -49,7 +48,7 @@ export class SheetLoader {
         const row: Field[] = [];
         if (data.values) {
           for (const cell of data.values) {
-            const field = new Field(new Range(row.length, sheet.fields.length));
+            const field = new Field(row.length, sheet.fields.length);
             field.formattedValue = cell.formattedValue || '';
             field.formula = SheetLoader.parseFormula(cell);
             field.display = SheetLoader.parseFormat(cell.effectiveFormat);

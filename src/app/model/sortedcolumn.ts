@@ -14,7 +14,7 @@ export class SortedNumberColumn extends TaskField {
   }
 
   check(field: Field): boolean {
-    const row = field.range.row0;
+    const row = field.row;
     const value = field.effectiveValue;
     if (this.minRow == null) {
       this.init(row, value);

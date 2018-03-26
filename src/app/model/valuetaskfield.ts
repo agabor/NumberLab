@@ -2,7 +2,7 @@
 import {Field} from './field';
 import {TaskField} from './taskfield';
 import {Range} from './range';
-import {Matrix} from "./matrix";
+import {Matrix} from './matrix';
 
 export class ValueTaskField extends TaskField {
 
@@ -21,7 +21,7 @@ export class ValueTaskField extends TaskField {
   }
 
   private getValue(field: Field) {
-    return this.values.get(field.range.column0 - this.range.column0, field.range.row0 - this.range.row0);
+    return this.values.get(field.column - this.range.column0, field.row - this.range.row0);
   }
 
   public getHint(field: Field): string {

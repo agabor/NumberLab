@@ -4,7 +4,7 @@ import {Range} from './range';
 
 export class Field {
 
-  constructor(public range: Range) {
+  constructor(public column: number, public row: number) {
 
   }
   effectiveValue: string|number;
@@ -13,6 +13,6 @@ export class Field {
   display: Display;
   format: string;
   public toString() {
-    return this.range.toString();
+    return Range.stringCoords(this.column, this.row);
   }
 }
