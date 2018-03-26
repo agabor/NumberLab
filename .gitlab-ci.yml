@@ -1,10 +1,19 @@
 image: trion/ng-cli-karma
 
-pages:
-  stage: deploy
+build:
+  stage: build
   script:
   - npm install
   - ng build --prod
+
+test:
+  stage: test
+  script:
+  - ng test
+
+pages:
+  stage: deploy
+  script:
   - mkdir public
   - mv dist/* public
   artifacts:
