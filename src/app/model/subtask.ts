@@ -1,7 +1,7 @@
 import {Field} from './field';
 import {Range} from './range';
 
-export abstract class TaskField {
+export abstract class SubTask {
 
   public hint: string = null;
 

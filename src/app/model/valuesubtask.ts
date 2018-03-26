@@ -1,10 +1,10 @@
 
 import {Field} from './field';
-import {TaskField} from './taskfield';
+import {SubTask} from './subtask';
 import {Range} from './range';
 import {Matrix} from './matrix';
 
-export class ValueTaskField extends TaskField {
+export class ValueSubTask extends SubTask {
 
   constructor(public range: Range, public values: Matrix) {
     super(range);

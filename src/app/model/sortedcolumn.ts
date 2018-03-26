@@ -1,8 +1,8 @@
-import {TaskField} from './taskfield';
+import {SubTask} from './subtask';
 import {Field} from './field';
 import {Range} from './range';
 
-export class SortedNumberColumn extends TaskField {
+export class SortedNumberColumn extends SubTask {
 
   minRow: number = null;
   minRowValue: any = null;

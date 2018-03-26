@@ -4,8 +4,7 @@ test:
   stage: test
   script:
   - npm install
-  - ng build --prod --base-href https://agabor.gitlab.io/NumberLab/
-  - ng test
+  - ng test --single-run
 
 pages:
   stage: deploy

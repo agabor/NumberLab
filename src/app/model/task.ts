@@ -2,7 +2,7 @@
 import {Sheet} from './sheet';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
 import {DisplayTaskField} from './displaytaskfield';
-import {TaskField} from './taskfield';
+import {SubTask} from './subtask';
 
 export class Task {
   attempted = false;
@@ -23,7 +23,7 @@ export class Task {
     return result;
   }
 
-  constructor(descriptionTemplate: string, public fields: TaskField[], private sanitizer: DomSanitizer = null) {
+  constructor(descriptionTemplate: string, public fields: SubTask[], private sanitizer: DomSanitizer = null) {
     const styles: string[] = [];
     for (const field of this.fields) {
       if (field instanceof DisplayTaskField) {

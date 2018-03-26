@@ -1,10 +1,10 @@
-import {TaskField} from './taskfield';
+import {SubTask} from './subtask';
 import {Display} from './display';
 import {Field} from './field';
 import {Color} from './color';
 import {Range} from './range';
 
-export class DisplayTaskField extends TaskField {
+export class DisplayTaskField extends SubTask {
 
   constructor(public range: Range, public format: Display) {
     super(range);

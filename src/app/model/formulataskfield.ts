@@ -1,9 +1,9 @@
 import {Field} from './field';
-import {TaskField} from './taskfield';
+import {SubTask} from './subtask';
 import {Range} from './range';
 import {Formula} from './formula';
 
-export class FormulaTaskField extends TaskField {
+export class FormulaTaskField extends SubTask {
 
   constructor(public range: Range, public formulas: Formula[]) {
     super(range);

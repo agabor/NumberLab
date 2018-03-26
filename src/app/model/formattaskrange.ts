@@ -1,8 +1,8 @@
 import {Field} from './field';
-import {TaskField} from './taskfield';
+import {SubTask} from './subtask';
 import {Range} from './range';
 
-export class FormatTaskRange extends TaskField {
+export class FormatTaskRange extends SubTask {
 
   constructor(public range: Range, public format: string) {
     super(range);

@@ -1,11 +1,11 @@
-import {ChangeDetectorRef, Component, HostListener, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import { DomSanitizer} from '@angular/platform-browser';
 import {Sheet} from './model/sheet';
 import {Section} from './model/section';
 import {Task} from './model/task';
 import {SheetLoader} from './loader';
 import {Color} from './model/color';
-import {ValueTaskField} from './model/valuetaskfield';
+import {ValueSubTask} from './model/valuesubtask';
 import {DisplayTaskField} from './model/displaytaskfield';
 import {FormulaTaskField} from './model/formulataskfield';
 import {FormatTaskRange} from './model/formattaskrange';
@@ -55,16 +55,16 @@ export class AppComponent implements OnInit {
     this.section = new Section('INFORMATIKA KÖZÉPSZINTŰ GYAKORLATI VIZSGA 2005', '', data, [
         new Task('A gyümölcsök termésmennyisége tonnában van megadva. Állítson be ezekre az értékekre ' +
       'ezres tagolású számformátumot, a számok után a „t” jelöléssel.', [
-        new ValueTaskField(new Range(0, 0, 7, 19), data), new FormatTaskRange(new Range(1, 1, 7, 19), '# ##0 t')]),
+        new ValueSubTask(new Range(0, 0, 7, 19), data), new FormatTaskRange(new Range(1, 1, 7, 19), '# ##0 t')]),
       new Task('Az első és második oszlop közé szúrjon be egy oszlopot. Az oszlop első sorába írja be az ' +
         '„Összes gyümölcstermés” szöveget! ',
-        [new ValueTaskField(new Range(0, 0, 0, 19), megyek),
-          new ValueTaskField(new Range(2, 1, 8, 19), numeric_data),
+        [new ValueSubTask(new Range(0, 0, 0, 19), megyek),
+          new ValueSubTask(new Range(2, 1, 8, 19), numeric_data),
           new FormatTaskRange(new Range(2, 2, 8, 19), '# ##0 t'),
-          new ValueTaskField(new Range(1, 0), new Matrix([['Összes gyümölcstermés']]))]),
+          new ValueSubTask(new Range(1, 0), new Matrix([['Összes gyümölcstermés']]))]),
       new Task('Számítsa ki – függvény segítségével – a létrehozott oszlopba, a megyében termelt gyümölcsök mennyiségét!',
-        [new ValueTaskField(new Range(0, 0, 0, 19), megyek),
-          new ValueTaskField(new Range(2, 1, 8, 19), numeric_data),
+        [new ValueSubTask(new Range(0, 0, 0, 19), megyek),
+          new ValueSubTask(new Range(2, 1, 8, 19), numeric_data),
           new FormatTaskRange(new Range(2, 2, 8, 19), '# ##0 t'),
           new FormulaTaskField(new Range(1, 1, 1, 19), [new Formula(['=SUM(', new Range(1, 0, 7, 0), ')'])])]),
       new Task('A megyék után, egy sort hagyjon üresen, s a következő sorban számítsa ki – függvény segítségével – azt, ' +
@@ -72,7 +72,7 @@ export class AppComponent implements OnInit {
         [new FormulaTaskField(new Range(1, 21, 8, 21), [new Formula(['=SUM(', new Range(0, -20, 0, -2), ')'])])]),
       new Task('Rendezze a megyéket az összes gyümölcstermés mennyisége szerinti csökkenő sorrendbe! ',
         [new SortedNumberColumn(new Range(1, 1, 1, 19), false),
-          new ValueTaskField(new Range(0, 1, 1, 19), new Matrix([['Szabolcs-Szatmár-Bereg', 316680],
+          new ValueSubTask(new Range(0, 1, 1, 19), new Matrix([['Szabolcs-Szatmár-Bereg', 316680],
             ['Bács-Kiskun', 70598],
             ['Borsod-Abaúj-Zemplén', 49057],
             ['Pest', 48132],
@@ -92,7 +92,7 @@ export class AppComponent implements OnInit {
             ['Jász-Nagykun-Szolnok', 3611],
             ['Komárom-Esztergom', 3323]]))]),
       new Task('Szúrjon be egy oszlopot az „Alma” oszlop elé! Az oszlop első sorába írja be a „Százalékos megoszlás” szöveget!',
-        [new ValueTaskField(new Range(2, 0), new Matrix([['Százalékos megoszlás']]))],
+        [new ValueSubTask(new Range(2, 0), new Matrix([['Százalékos megoszlás']]))],
         sanitizer),
       new Task('A beszúrt oszlopban – függvény segítségével kiszámítva – jelenítse meg, hogy az országban termett gyümölcsmennyiség' +
         'hány százalékát termelik az egyes megyék! A kiszámított értékeket százalék formátumban két tizedes jeggyel adja meg!',
