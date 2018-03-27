@@ -1,11 +1,19 @@
 image: trion/ng-cli-karma
 
+cache:
+  paths:
+  - node_modules/
 
-job:
+test:
+  stage: test
+  script:
+  - npm install
+  - ng test --single-run
+  except:
+  - master
+
+pages:
   stage: deploy
-  cache:
-    paths:
-    - node_modules/
   script:
   - npm install
   - ng build --prod --base-href https://agabor.gitlab.io/NumberLab/
@@ -15,7 +23,5 @@ job:
   artifacts:
     paths:
     - public
-  dependencies:
-  - build
   only:
   - master
