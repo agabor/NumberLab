@@ -3,7 +3,7 @@ import {SubTask} from './subtask';
 import {Range} from './range';
 import {Formula} from './formula';
 
-export class FormulaTaskField extends SubTask {
+export class FormulaSubTask extends SubTask {
 
   constructor(public range: Range, public formulas: Formula[]) {
     super(range);

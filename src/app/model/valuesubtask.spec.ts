@@ -4,8 +4,8 @@ import {ValueSubTask} from './valuesubtask';
 import {Field} from './field';
 
 
-describe('Matrix', () => {
-  it('should split a matrix', () => {
+describe('ValueSubTask', () => {
+  it('should check a value sub task', () => {
     const m = new Matrix([
       [0, 1, 2, 3, 4, 5],
       [10, 11, 12, 13, 14, 15],

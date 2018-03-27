@@ -7,7 +7,7 @@ import {SheetLoader} from './loader';
 import {Color} from './model/color';
 import {ValueSubTask} from './model/valuesubtask';
 import {DisplayTaskField} from './model/displaytaskfield';
-import {FormulaTaskField} from './model/formulataskfield';
+import {FormulaSubTask} from './model/formulasubtask';
 import {FormatTaskRange} from './model/formattaskrange';
 import {Range} from './model/range';
 import {Formula} from './model/formula';
@@ -66,10 +66,10 @@ export class AppComponent implements OnInit {
         [new ValueSubTask(new Range(0, 0, 0, 19), megyek),
           new ValueSubTask(new Range(2, 1, 8, 19), numeric_data),
           new FormatTaskRange(new Range(2, 2, 8, 19), '# ##0 t'),
-          new FormulaTaskField(new Range(1, 1, 1, 19), [new Formula(['=SUM(', new Range(1, 0, 7, 0), ')'])])]),
+          new FormulaSubTask(new Range(1, 1, 1, 19), [new Formula(['=SUM(', new Range(1, 0, 7, 0), ')'])])]),
       new Task('A megyék után, egy sort hagyjon üresen, s a következő sorban számítsa ki – függvény segítségével – azt, ' +
         'hogy az egyes gyümölcsökből mennyi termett az országban összesen!',
-        [new FormulaTaskField(new Range(1, 21, 8, 21), [new Formula(['=SUM(', new Range(0, -20, 0, -2), ')'])])]),
+        [new FormulaSubTask(new Range(1, 21, 8, 21), [new Formula(['=SUM(', new Range(0, -20, 0, -2), ')'])])]),
       new Task('Rendezze a megyéket az összes gyümölcstermés mennyisége szerinti csökkenő sorrendbe! ',
         [new SortedNumberColumn(new Range(1, 1, 1, 19), false),
           new ValueSubTask(new Range(0, 1, 1, 19), new Matrix([['Szabolcs-Szatmár-Bereg', 316680],
@@ -96,7 +96,7 @@ export class AppComponent implements OnInit {
         sanitizer),
       new Task('A beszúrt oszlopban – függvény segítségével kiszámítva – jelenítse meg, hogy az országban termett gyümölcsmennyiség' +
         'hány százalékát termelik az egyes megyék! A kiszámított értékeket százalék formátumban két tizedes jeggyel adja meg!',
-        [new FormulaTaskField(new Range(2, 1, 2, 19), [new Formula(['=', new Range(-1, 0), '/B22'])]),
+        [new FormulaSubTask(new Range(2, 1, 2, 19), [new Formula(['=', new Range(-1, 0), '/B22'])]),
           new FormatTaskRange(new Range(2, 1, 2, 19), '0.00%')],
         sanitizer),
       new Task('Színezd az A1 cella hátterét [zöldre] és a B1 cella hátterét [kékre]!',
