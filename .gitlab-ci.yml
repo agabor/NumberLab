@@ -5,6 +5,10 @@ build:
   script:
   - npm install
   - ng build --prod --base-href https://agabor.gitlab.io/NumberLab/
+  artifacts:
+    paths:
+    - node_modules/
+    - dist/
 
 test:
   stage: test
@@ -22,7 +26,6 @@ pages:
     paths:
     - public
   dependencies:
-  - test
   - build
   only:
   - master
