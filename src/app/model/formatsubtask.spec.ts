@@ -1,7 +1,7 @@
 import {Matrix} from './matrix';
 import {Range} from './range';
 import {Field} from './field';
-import { FormatTaskRange } from './formattaskrange';
+import { FormatSubTask } from './formatsubtask';
 
 
 describe('ValueSubTask', () => {
@@ -14,7 +14,7 @@ describe('ValueSubTask', () => {
       [40, 41, 42, 43, 44, 45],
     ]);
 
-    const st = new FormatTaskRange(new Range(5, 5, 10, 9),  '# ##0 t');
+    const st = new FormatSubTask(new Range(5, 5, 10, 9),  '# ##0 t');
 
     const field = new Field(5, 6);
     field.effectiveValue = 10;

@@ -2,7 +2,7 @@ import {Field} from './field';
 import {SubTask} from './subtask';
 import {Range} from './range';
 
-export class FormatTaskRange extends SubTask {
+export class FormatSubTask extends SubTask {
 
   constructor(public range: Range, public format: string) {
     super(range);
