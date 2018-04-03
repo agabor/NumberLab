@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import { DomSanitizer} from '@angular/platform-browser';
+import {DomSanitizer} from '@angular/platform-browser';
 import {Sheet} from './model/sheet';
 import {Section} from './model/section';
 import {Task} from './model/task';
