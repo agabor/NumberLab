@@ -40,7 +40,7 @@ export class SheetLoader {
     console.log('gapi.client.sheets.spreadsheets.get');
     gapi.client.sheets.spreadsheets.get({
       spreadsheetId: spreadsheetId,
-      ranges: ['Sheet1!A1:H20'],
+      ranges: ['Munkalap1!A1:M30'],
       includeGridData: true
     }).then(function (response) {
       console.log(response);
