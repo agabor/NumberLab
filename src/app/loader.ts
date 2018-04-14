@@ -34,42 +34,41 @@ export class SheetLoader {
     return format;
   }
   load(spreadsheetId: string) {
-    const sheet = new Sheet();
-    const self = this;
-
     console.log('gapi.client.sheets.spreadsheets.get');
     gapi.client.sheets.spreadsheets.get({
       spreadsheetId: spreadsheetId,
       includeGridData: true
-    }).then(function (response) {
-      console.log(response);
-      for (const data of response.result.sheets[0].data[0].rowData) {
-        const row: Field[] = [];
-        if (data.values) {
-          for (const cell of data.values) {
-            const field = new Field(row.length, sheet.fields.length);
-            field.formattedValue = cell.formattedValue || '';
-            field.formula = SheetLoader.parseFormula(cell);
-            field.display = SheetLoader.parseFormat(cell.effectiveFormat);
-            if (cell.effectiveValue) {
-              field.effectiveValue = cell.effectiveValue.numberValue || cell.effectiveValue.stringValue;
-            }
-            const userEnteredFormat = cell.userEnteredFormat;
-            if (userEnteredFormat) {
-              const numberFormat = userEnteredFormat.numberFormat;
-              if (numberFormat) {
-                field.format = numberFormat.pattern;
-              }
-            }
-            row.push(field);
-          }
-        }
-        sheet.fields.push(row);
-      }
-      self.onLoaded(sheet);
-    }, function (response) {
+    }).then(this.parse, function (response) {
       console.log(response.result.error.message);
     });
   }
 
+  parse(response) {
+    const sheet = new Sheet();
+    console.log(response);
+    for (const data of response.result.sheets[0].data[0].rowData) {
+      const row: Field[] = [];
+      if (data.values) {
+        for (const cell of data.values) {
+          const field = new Field(row.length, sheet.fields.length);
+          field.formattedValue = cell.formattedValue || '';
+          field.formula = SheetLoader.parseFormula(cell);
+          field.display = SheetLoader.parseFormat(cell.effectiveFormat);
+          if (cell.effectiveValue) {
+            field.effectiveValue = cell.effectiveValue.numberValue || cell.effectiveValue.stringValue;
+          }
+          const userEnteredFormat = cell.userEnteredFormat;
+          if (userEnteredFormat) {
+            const numberFormat = userEnteredFormat.numberFormat;
+            if (numberFormat) {
+              field.format = numberFormat.pattern;
+            }
+          }
+          row.push(field);
+        }
+      }
+      sheet.fields.push(row);
+    }
+    this.onLoaded(sheet);
+  }
 }

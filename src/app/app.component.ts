@@ -217,12 +217,9 @@ export class AppComponent implements OnInit {
   }
 
   checkTask() {
-
-    console.log('checkTask');
     if (this.activeTask) {
       this.activeTask.attempted = true;
     }
-    console.log('>>gapi.client.sheets.spreadsheets.get');
     this.loader.onLoaded = (sheets) => this.checkTasks(sheets);
     this.loader.load(AppComponent.SpreadsheetID);
   }

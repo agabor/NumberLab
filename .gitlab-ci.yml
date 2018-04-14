@@ -1,9 +1,5 @@
 image: trion/ng-cli-karma
 
-cache:
-  paths:
-  - node_modules/
-
 test:
   stage: test
   script:
