@@ -5,9 +5,9 @@ import {Range} from './range';
 export class SortedNumberColumn extends SubTask {
 
   minRow: number = null;
-  minRowValue: any = null;
+  minRowValue: string|number = null;
   maxRow: number = null;
-  maxRowValue: any = null;
+  maxRowValue: string|number = null;
 
   constructor(range: Range, public ascending: boolean) {
     super(range);
@@ -16,7 +16,7 @@ export class SortedNumberColumn extends SubTask {
   check(field: Field): boolean {
     const row = field.row;
     const value = field.effectiveValue;
-    if (this.minRow == null) {
+    if (this.minRow === null) {
       this.init(row, value);
       return true;
     }
@@ -24,7 +24,6 @@ export class SortedNumberColumn extends SubTask {
     if (row < this.minRow) {
       if (this.ascending && value > this.minRowValue || !this.ascending && value < this.minRowValue) {
         this.hint = `A(z) ${field} és a ${new Range(this.range.column0, this.minRow)} cellák értéke nincs megfelelő sorrendben.`;
-        this.init(null, null);
         return false;
       }
       this.minRow = row;
@@ -35,7 +34,6 @@ export class SortedNumberColumn extends SubTask {
     if (row > this.maxRow) {
       if (this.ascending && value < this.maxRowValue || !this.ascending && value > this.maxRowValue) {
         this.hint = `A(z) ${field} és a ${new Range(this.range.column0, this.maxRow)} cellák értéke nincs megfelelő sorrendben.`;
-        this.init(null, null);
         return false;
       }
       this.maxRow = row;
