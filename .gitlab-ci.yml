@@ -9,6 +9,9 @@ test:
   script:
   - npm install
   - ng test --single-run
+  artifacts:
+    paths:
+    - coverage
   except:
   - master
 

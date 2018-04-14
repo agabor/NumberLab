@@ -213,6 +213,7 @@ export class AppComponent implements OnInit {
       this.finishedTasks.push(this.section.tasks[i]);
     }
     this.activeTask = this.section.tasks[AppComponent.TaskIndex];
+    this.cdr.detectChanges();
   }
 
   checkTask() {

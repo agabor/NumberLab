@@ -3,7 +3,7 @@
   <p>{{section.description}}</p>
 
   <div class="doc-container">
-    <iframe *ngIf="false" [src]='sheetURL()'></iframe>
+    <iframe [src]='sheetURL()'></iframe>
     <div class="loader" *ngIf="SpreadsheetID == null"></div>
   </div>
   <div class="card-deck mb-3 text-center active-task" *ngIf="activeTask != null">
