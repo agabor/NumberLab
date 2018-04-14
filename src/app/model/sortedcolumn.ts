@@ -51,4 +51,9 @@ export class SortedNumberColumn extends SubTask {
     this.maxRow = row;
     this.maxRowValue = value;
   }
+
+
+  reset() {
+    this.init(null, null);
+  }
 }

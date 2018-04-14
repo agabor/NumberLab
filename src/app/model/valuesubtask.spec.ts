@@ -2,6 +2,8 @@ import {Matrix} from './matrix';
 import {Range} from './range';
 import {ValueSubTask} from './valuesubtask';
 import {Field} from './field';
+import { Sheet } from './sheet';
+import { Task } from './task';
 
 
 describe('ValueSubTask', () => {
@@ -21,6 +23,20 @@ describe('ValueSubTask', () => {
     expect(st.check(field)).toBe(true);
     field.row += 1;
     expect(st.check(field)).toBe(false);
+
+    const sheet = new Sheet();
+    for (let r = 0; r < 5; ++r) {
+      const row: Field[] = [];
+      for (let c = 0; c < 6; ++c) {
+        const f = new Field(c, r);
+        f.effectiveValue = m.get(c, r);
+        row.push(f);
+      }
+      sheet.fields.push(row);
+    }
+    const task = new Task('', [new ValueSubTask(new Range(0, 0, 5, 4), m)]);
+    expect(task.check(sheet)).toBe(true);
+    expect(task.errorMessage).toBe('');
   });
 });
 

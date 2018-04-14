@@ -1,6 +1,6 @@
 
 import {Sheet} from './sheet';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {DisplayTaskField} from './displaytaskfield';
 import {SubTask} from './subtask';
 
