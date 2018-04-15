@@ -1,7 +1,7 @@
 
 import {Sheet} from './sheet';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import {DisplayTaskField} from './displaytaskfield';
+import {DisplaySubTask} from './displaysubtask';
 import {SubTask} from './subtask';
 
 export class Task {
@@ -26,8 +26,8 @@ export class Task {
   constructor(descriptionTemplate: string, public fields: SubTask[], private sanitizer: DomSanitizer = null) {
     const styles: string[] = [];
     for (const field of this.fields) {
-      if (field instanceof DisplayTaskField) {
-        const formatTaskField = (<DisplayTaskField>field);
+      if (field instanceof DisplaySubTask) {
+        const formatTaskField = (<DisplaySubTask>field);
         styles.push(formatTaskField.style);
       }
     }

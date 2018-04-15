@@ -51,5 +51,8 @@ describe('SortedNumberColumn', () => {
         expect(ascCol2.check(field)).toBe(false);
       }
     }
+
+
+    ascCol.reset();
   });
 });

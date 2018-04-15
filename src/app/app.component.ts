@@ -6,7 +6,7 @@ import {Task} from './model/task';
 import {SheetLoader} from './loader';
 import {Color} from './model/color';
 import {ValueSubTask} from './model/valuesubtask';
-import {DisplayTaskField} from './model/displaytaskfield';
+import {DisplaySubTask} from './model/displaysubtask';
 import {FormulaSubTask} from './model/formulasubtask';
 import {FormatSubTask} from './model/formatsubtask';
 import {Range} from './model/range';
@@ -100,8 +100,8 @@ export class AppComponent implements OnInit {
           new FormatSubTask(new Range(2, 1, 2, 19), '0.00%')],
         sanitizer),
       new Task('Színezd az A1 cella hátterét [zöldre] és a B1 cella hátterét [kékre]!',
-        [new DisplayTaskField(new Range(0, 0), {backgroundColor: new Color(0, 1, 0)}),
-          new DisplayTaskField(new Range(1, 0), {backgroundColor: new Color(0, 0, 1)})],
+        [new DisplaySubTask(new Range(0, 0), {backgroundColor: new Color(0, 1, 0)}),
+          new DisplaySubTask(new Range(1, 0), {backgroundColor: new Color(0, 0, 1)})],
         sanitizer)
     ]);
 

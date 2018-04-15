@@ -1,6 +1,6 @@
 import {Task} from './task';
 import {isNumber} from 'util';
-import {Matrix} from "./matrix";
+import {Matrix} from './matrix';
 
 export class Section {
   constructor(public title: string, public description: string, private values: Matrix, public tasks: Task[]) {
