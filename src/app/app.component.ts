@@ -128,8 +128,8 @@ export class AppComponent implements OnInit {
   initClient() {
     const self = this;
     // Client ID and API key from the Developer Console
-    const CLIENT_ID = '8401109384-9vgun9cicdbbnasprfeeta92sq3k5vbm.apps.googleusercontent.com';
-    const API_KEY = 'AIzaSyC4zMvcnbjNbbyfKgIw1Y2rvlIP_UKdl-4';
+    const CLIENT_ID = '341436349494-h8k9t7tra8m6ap7391auac5tuhs8n29a.apps.googleusercontent.com';
+    const API_KEY = 'AIzaSyDG9YzXjyFFvVRdJrQEB4R-af-SX18DNlg';
 
     // Array of API discovery doc URLs for APIs used by the quickstart
     const DISCOVERY_DOCS = ['https://sheets.googleapis.com/$discovery/rest?version=v4'];
