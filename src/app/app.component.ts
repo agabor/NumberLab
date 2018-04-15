@@ -147,7 +147,6 @@ export class AppComponent implements OnInit {
       console.log('loaded');
       // Listen for sign-in state changes.
       const authInstance = gapi.auth2.getAuthInstance();
-      console.log(authInstance);
       authInstance.isSignedIn.listen(status => self.updateSigninStatus(status));
 
       // Handle the initial sign-in state.
@@ -184,7 +183,6 @@ export class AppComponent implements OnInit {
     this.cdr.detectChanges();
   }
   ngOnInit() {
-    console.log(gapi);
     this.handleClientLoad();
 
   }
