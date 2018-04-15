@@ -23,10 +23,6 @@ export class Color {
     return Color.distance(this, other) < 0.3;
   }
 
-  public toString = (): string => {
-    return `(r: ${this.red}, g: ${this.green}, b: ${this.blue})`;
-  }
-
   public get html(): string {
     return '#' + Color.toHex(this.red) + Color.toHex(this.green) + Color.toHex(this.blue);
   }

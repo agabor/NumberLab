@@ -3,7 +3,7 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {Sheet} from './model/sheet';
 import {Section} from './model/section';
 import {Task} from './model/task';
-import {SheetLoader} from './loader';
+import {Mapper} from './mapper';
 import {Color} from './model/color';
 import {ValueSubTask} from './model/valuesubtask';
 import {DisplaySubTask} from './model/displaysubtask';
@@ -23,7 +23,7 @@ export class AppComponent implements OnInit {
 
 
   hintsShown = false;
-  loader: SheetLoader = new SheetLoader;
+  mapper: Mapper = new Mapper;
   section: Section;
   activeTask: Task = null;
   finishedTasks: Task[] = [];
@@ -193,7 +193,7 @@ export class AppComponent implements OnInit {
     const self = this;
     if (isSignedIn) {
       if (!AppComponent.SpreadsheetID) {
-        this.section.create(gapi, function (id: string) {
+        this.mapper.create(gapi, this.section, function (id: string) {
           AppComponent.SpreadsheetID = id;
           self.setTasks();
           self.cdr.detectChanges();
@@ -220,8 +220,8 @@ export class AppComponent implements OnInit {
     if (this.activeTask) {
       this.activeTask.attempted = true;
     }
-    this.loader.onLoaded = (sheets) => this.checkTasks(sheets);
-    this.loader.load(AppComponent.SpreadsheetID);
+    this.mapper.onLoaded = (sheets) => this.checkTasks(sheets);
+    this.mapper.load(AppComponent.SpreadsheetID);
   }
 
   checkTasks(sheet: Sheet) {
